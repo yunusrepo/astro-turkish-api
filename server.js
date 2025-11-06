@@ -29,10 +29,9 @@ const TR_SIGN = {
 
 const cache = {}; // { key: { data, expiresAt } }
 
-// ---------- OpenAI helpers ----------
 async function openaiJSON(system, user) {
-  if (!OPENAI_KEY) throw new Error("OPENAI_API_KEY is missing");
-  const res = await fetch("https://api.openai.com/v1/chat/completions", {
+  if (!OPENAI_KEY) throw new Error("OPENAI_API_KEY missing");
+  const r = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {
       "Authorization": `Bearer ${OPENAI_KEY}`,
@@ -48,35 +47,33 @@ async function openaiJSON(system, user) {
       ]
     })
   });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`OpenAI ${res.status}: ${text.slice(0,160)}`);
+  if (!r.ok) {
+    const t = await r.text();
+    throw new Error(`OpenAI ${r.status}: ${t.slice(0,160)}`);
   }
-  const data = await res.json();
+  const data = await r.json();
   return JSON.parse(data.choices[0].message.content);
 }
 
 function fashionTip(color, mood) {
   const tipsByColor = {
-    "Gri": "Sade tonlar ve temiz kesimler sofistike bir hava verir.",
-    "Mavi": "Açık mavi gömlek ya da denim günün ritmini dengeler.",
-    "Kırmızı": "Küçük bir kırmızı aksesuar enerjiyi yükseltir.",
-    "Yeşil": "Doğal tonlar ve dokular iç huzuru yansıtır.",
-    "Pembe": "Yumuşak pembe detaylar sıcaklık katar.",
-    "Siyah": "Net bir siluetle minimal ve güçlü görün."
+    "Gri": "Sade tonlar ve net kesimler seç.",
+    "Mavi": "Açık mavi veya denim dengeleme sağlar.",
+    "Kırmızı": "Küçük bir kırmızı aksesuar enerji katar.",
+    "Yeşil": "Doğal tonlar iç huzuru yansıtır.",
+    "Pembe": "Yumuşak detaylarla sıcaklık ekle.",
+    "Siyah": "Minimal ve güçlü bir siluet uygula."
   };
   const tipsByMood = {
-    "Dengeli": "Minimal ama zarif bir görünüm seç.",
-    "Enerjik": "Spor-şık parçalar ritmine uyum sağlar.",
-    "Romantik": "İnce kumaşlar ve pastel tonlar ruh haline iyi gelir.",
-    "Sakin": "Nötr tonlar ve rahat kesimler konfor sağlar."
+    "Dengeli": "Zarif ve yalın kal.",
+    "Enerjik": "Spor-şık parçaları karıştır.",
+    "Romantik": "Pastel dokulara yönel.",
+    "Sakin": "Nötr ve rahat kesimler kullan."
   };
-  return tipsByColor[color] || tipsByMood[mood] || "Zarif bir aksesuar ekle ve sade kal.";
+  return tipsByColor[color] || tipsByMood[mood] || "Zarif bir aksesuar ekle.";
 }
 
-// ---------- Routes ----------
-
-// OpenAI-only daily by sun sign
+// ---------- DAILY: OpenAI-only ----------
 app.get("/api/daily", async (req, res) => {
   try {
     const sign = String(req.query.sign || "").toLowerCase();
@@ -85,28 +82,30 @@ app.get("/api/daily", async (req, res) => {
     if (!DAY_VALUES.includes(day)) return res.status(400).json({ error: "Geçersiz gün." });
 
     const cacheKey = `daily:${sign}:${day}`;
-    const now = Date.now();
-    if (cache[cacheKey]?.expiresAt > now) return res.json(cache[cacheKey].data);
+    if (cache[cacheKey]?.expiresAt > Date.now()) return res.json(cache[cacheKey].data);
 
-    const system = "Rolün AstroVogue editörü. Türkçe, sakin ve premium yaz. Abartı yok. Kısa, net ve güven verici ol.";
-    const user = JSON.stringify({
-      tur: "gunluk",
-      gun: day,
-      gunes: TR_SIGN[sign],
-      alanlar: ["aciklama","ruh_hali","renk","uyum","sansli_sayi","sansli_saat","analiz"]
-    }) + "\n" + [
-      "Yalnızca aşağıdaki JSON anahtarlarını üret:",
-      "{ aciklama, ruh_hali, renk, uyum, sansli_sayi, sansli_saat, analiz }",
-      "hepsi kısa ve doğal cümleler olsun"
-    ].join("\n");
+    const system =
+      "AstroVogue için kıdemli bir astrologsun. Türkçe yaz. Ton net, sakin, profesyonel. " +
+      "Kısa cümleler. Kaderci söylem yok. Sağlık ve tıbbi iddialar yok. " +
+      "Gerçekçi günlük yönlendirme ver. Sadece istenen alanları döndür.";
+
+    const user =
+      JSON.stringify({
+        tur: "gunluk",
+        gun: day,
+        gunes: TR_SIGN[sign]
+      }) +
+      "\n" +
+      "Sadece şu JSON anahtarlarını üret: " +
+      "{ aciklama, ruh_hali, renk, uyum, sansli_sayi, sansli_saat, analiz }. " +
+      "Her alan 1 cümle, analiz 1-2 cümle olsun.";
 
     let j = await openaiJSON(system, user);
-
-    // safety defaults
     j.renk = j.renk || "Gri";
     j.ruh_hali = j.ruh_hali || "Dengeli";
 
     const payload = {
+      marka: "AstroVogue",
       burc: TR_SIGN[sign],
       gun: day,
       tarih: new Date().toLocaleDateString("tr-TR"),
@@ -120,28 +119,28 @@ app.get("/api/daily", async (req, res) => {
       moda_onerisi: fashionTip(j.renk, j.ruh_hali)
     };
 
-    cache[cacheKey] = { data: payload, expiresAt: now + 30 * 60 * 1000 };
+    cache[cacheKey] = { data: payload, expiresAt: Date.now() + 30 * 60 * 1000 };
     res.json(payload);
   } catch (err) {
     console.error(err.message);
-    // graceful fallback so UI never breaks
     res.json({
+      marka: "AstroVogue",
       burc: TR_SIGN[String(req.query.sign||"").toLowerCase()] || "—",
       gun: req.query.day || "today",
       tarih: new Date().toLocaleDateString("tr-TR"),
-      aciklama: "Bugün enerjini dengede tut. Küçük adımlar en verimlisi.",
+      aciklama: "Günü basit planla ve iletişimde net ol.",
       uyum: "Yengeç",
       ruh_hali: "Dengeli",
       renk: "Gri",
       sansli_sayi: "4",
       sansli_saat: "14:00",
-      analiz: "Günü sade planla, net iletişim kur. Akışa izin ver.",
-      moda_onerisi: "Sade tonlar ve temiz kesimler sofistike bir hava verir."
+      analiz: "Odak dağılmasın. Sakin ilerle.",
+      moda_onerisi: "Sade tonlar ve net kesimler seç."
     });
   }
 });
 
-// Personalized with sun + rising + optional birth placeholders
+// ---------- PERSONALIZED: sun + rising + pro-astrologer tone ----------
 app.post("/api/personalized", async (req, res) => {
   try {
     const sun = String(req.body.sun || "").toLowerCase();
@@ -151,28 +150,31 @@ app.post("/api/personalized", async (req, res) => {
     if (rising && !SIGNS.includes(rising)) return res.status(400).json({ error: "Geçersiz yükselen burç." });
     if (!DAY_VALUES.includes(day)) return res.status(400).json({ error: "Geçersiz gün." });
 
-    const system = "Rolün AstroVogue editörü. Türkçe, sakin ve premium yaz. Kısa, net, güven verici.";
+    const system =
+      "AstroVogue için kıdemli bir astrologsun. Türkçe yaz. Net, ölçülü, güvenilir ton. " +
+      "Güneş ve yükseleni birlikte düşün. Somut yönlendirme ver. " +
+      "Sağlık iddiası yok. Abartı yok. Sadece istenen alanları döndür.";
+
     const userObj = {
       tur: "kisisel",
       gun: day,
       gunes: TR_SIGN[sun],
-      yukselen: rising ? TR_SIGN[rising] : null,
-      // ileride gerçek doğum verisi ve harita özetleri buraya eklenecek
-      dogum: req.body.birth || null
+      yukselen: rising ? TR_SIGN[rising] : null
+      // ileride: dogum verisi ve harita özetleri eklenecek
     };
-    const user = JSON.stringify(userObj) + "\n" + [
-      "Sadece şu JSON anahtarlarını üret:",
-      "{ odak, rehber, stil, aciklama, ruh_hali, renk, uyum }",
-      "odak: günün teması. rehber: 2-3 cümle yönlendirme.",
-      "stil: 1 cümle moda önerisi. Diğer alanlar kısa olmalı."
-    ].join("\n");
+    const user =
+      JSON.stringify(userObj) +
+      "\n" +
+      "Sadece şu JSON anahtarlarını üret: " +
+      "{ odak, rehber, stil, aciklama, ruh_hali, renk, uyum }. " +
+      "odak bir kelime ya da kısa ifade. rehber 2-3 cümle. stil 1 cümle.";
 
     let j = await openaiJSON(system, user);
-
     j.renk = j.renk || "Gri";
     j.ruh_hali = j.ruh_hali || "Dengeli";
 
     res.json({
+      marka: "AstroVogue",
       tarih: new Date().toLocaleDateString("tr-TR"),
       gunes: TR_SIGN[sun],
       yukselen: rising ? TR_SIGN[rising] : null,
@@ -181,12 +183,13 @@ app.post("/api/personalized", async (req, res) => {
       renk: j.renk,
       uyum: j.uyum || "",
       odak: j.odak || "Genel",
-      rehber: j.rehber || "Planı sade tut ve iletişimde net ol.",
+      rehber: j.rehber || "Planı sade tut ve net ol.",
       stil: j.stil || fashionTip(j.renk, j.ruh_hali)
     });
   } catch (err) {
     console.error(err.message);
     res.json({
+      marka: "AstroVogue",
       tarih: new Date().toLocaleDateString("tr-TR"),
       gunes: TR_SIGN[String(req.body.sun||"").toLowerCase()] || "—",
       yukselen: req.body.rising ? TR_SIGN[String(req.body.rising).toLowerCase()] : null,
@@ -196,7 +199,7 @@ app.post("/api/personalized", async (req, res) => {
       uyum: "Yengeç",
       odak: "Genel",
       rehber: "Net plan yap, küçük adımlar at.",
-      stil: "Minimal bir siluet ve tek güçlü aksesuar uygula."
+      stil: "Minimal bir siluet ve tek güçlü aksesuar."
     });
   }
 });
