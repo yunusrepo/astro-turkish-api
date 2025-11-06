@@ -3,6 +3,7 @@ import fetch from "node-fetch";
 import morgan from "morgan";
 import path from "path";
 import { fileURLToPath } from "url";
+import { setTimeout as wait } from "timers/promises";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -12,7 +13,7 @@ app.use(morgan("tiny"));
 
 const PORT = process.env.PORT || 3000;
 
-// serve static files
+// serve the static site
 app.use(express.static(path.join(__dirname, "public")));
 
 const cache = {};
@@ -39,14 +40,30 @@ function buildAnalysis(trSign, payload) {
   return `${trSign} için kısa analiz: ${parts.join(" • ")}`;
 }
 
+// retry with headers so the free endpoint behaves
 async function getAztro(sign, day) {
   const url = `https://aztro.sameerkumar.website/?sign=${sign}&day=${day}`;
-  const res = await fetch(url, { method: "POST" });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`Aztro error ${res.status}: ${text}`);
+  let lastErr;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "User-Agent": "AstroReader/1.0 (+https://example.com)",
+          "Accept": "application/json"
+        }
+      });
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`Aztro ${res.status}: ${text.slice(0, 160)}`);
+      }
+      return await res.json();
+    } catch (err) {
+      lastErr = err;
+      await wait(300 * attempt);
+    }
   }
-  return res.json();
+  throw lastErr || new Error("Unknown Aztro error");
 }
 
 app.get("/api/daily", async (req, res) => {
@@ -55,10 +72,10 @@ app.get("/api/daily", async (req, res) => {
     const day = String(req.query.day || "today").toLowerCase();
 
     if (!SIGNS.includes(sign)) {
-      return res.status(400).json({ error: "Invalid sign. Use one of: " + SIGNS.join(", ") });
+      return res.status(400).json({ error: "Geçersiz burç." });
     }
     if (!DAY_VALUES.includes(day)) {
-      return res.status(400).json({ error: "Invalid day. Use today, tomorrow, or yesterday." });
+      return res.status(400).json({ error: "Geçersiz gün." });
     }
 
     const cacheKey = `${sign}:${day}`;
@@ -68,7 +85,22 @@ app.get("/api/daily", async (req, res) => {
       return res.json(hit.data);
     }
 
-    const data = await getAztro(sign, day);
+    let data;
+    try {
+      data = await getAztro(sign, day);
+    } catch (e) {
+      console.error("Aztro call failed:", e.message);
+      // soft fallback so UI still shows something
+      data = {
+        current_date: new Date().toLocaleDateString("tr-TR"),
+        description: "Bugün enerjini yüksek tut. Basit hedeflerle ilerlemek en iyisi.",
+        compatibility: "Yengeç",
+        mood: "Dengeli",
+        color: "Gri",
+        lucky_number: "4",
+        lucky_time: "14:00"
+      };
+    }
 
     const payload = {
       burc: TR_SIGN[sign],
@@ -91,7 +123,7 @@ app.get("/api/daily", async (req, res) => {
   }
 });
 
-// root serves the UI
+// root serves the UI file
 app.get("/", (_req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
