@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>AstroVogue</title>
-    <meta name="description" content="Günlük burç ve stil rehberi. Güneş ve yükselen etkisiyle net yönlendirme." />
+    <meta name="description" content="Günlük astroloji ve stil rehberi. Güneş ve yükselen ile kişisel yönlendirme." />
     <link rel="icon" href="/favicon.svg" />
     <style>
       :root{
@@ -15,19 +15,18 @@
       *{box-sizing:border-box}
       body{margin:0; background:var(--bg); color:var(--ink);
         font:16px/1.6 -apple-system,BlinkMacSystemFont,"Inter","Segoe UI",Roboto,Ubuntu,"Helvetica Neue",Arial,sans-serif}
-      .wrap{max-width:1000px; margin:0 auto; padding:40px 20px 80px}
-      header{display:flex; align-items:center; gap:12px; margin-bottom:40px}
+      .wrap{max-width:1000px; margin:0 auto; padding:32px 16px 64px}
+      header{display:flex; align-items:center; gap:12px; margin-bottom:24px}
       .logo{width:36px; height:36px; border-radius:10px; background:var(--ink); display:grid; place-items:center; color:#fff; font-weight:600}
       .title{font-size:20px; font-weight:650; color:var(--brand)}
-      .hero{display:grid; gap:14px; margin:20px 0 28px}
-      .hero h1{margin:0; font-size:40px; line-height:1.15; letter-spacing:-0.5px}
+      .hero{display:grid; gap:10px; margin:10px 0 20px}
+      .hero h1{margin:0; font-size:34px; line-height:1.15; letter-spacing:-0.5px}
       .hero p{margin:0; color:var(--muted); max-width:58ch}
-      .grid{display:grid; grid-template-columns:1.2fr 1fr; gap:18px}
+      .grid{display:grid; grid-template-columns:1.1fr 1fr; gap:18px}
       @media (max-width:900px){ .grid{grid-template-columns:1fr} }
       .panel{background:var(--panel); border-radius:var(--radius); box-shadow:var(--shadow); border:1px solid var(--line)}
-      .card{padding:20px}
-      .card + .card{border-top:1px solid var(--line)}
-      .label{font-size:13px; color:var(--muted); margin-bottom:8px}
+      .card{padding:16px}
+      .label{font-size:13px; color:var(--muted); margin-bottom:6px}
       select,button{appearance:none; border:1px solid var(--line); background:#fff; color:var(--ink);
         border-radius:12px; padding:12px 14px; font:inherit; width:100%}
       .row{display:grid; grid-template-columns:1fr 1fr; gap:12px}
@@ -36,13 +35,14 @@
       .btn--brand{background:var(--ink); color:#fff; border-color:var(--ink)}
       .btn--accent{background:var(--accent); color:#fff; border-color:var(--accent)}
       .muted{color:var(--muted)}
-      .result{padding:20px; display:grid; gap:10px; min-height:120px}
+      .result{padding:16px; display:grid; gap:10px; min-height:120px}
       .result h3{margin:0 0 4px 0; font-size:18px}
       .kv{display:grid; grid-template-columns:140px 1fr; gap:6px; padding-top:6px}
       .chip{display:inline-block; font-size:12px; color:#111; background:#f1f3f5; border:1px solid var(--line); padding:6px 10px; border-radius:999px; margin-right:6px}
-      footer{margin-top:28px; color:var(--muted); font-size:13px}
+      footer{margin-top:24px; color:var(--muted); font-size:13px}
       .fade-in{animation:fade .25s ease both}
       @keyframes fade{from{opacity:0; transform:translateY(3px)} to{opacity:1; transform:none}}
+      .status{font-size:13px; color:var(--muted); padding:8px 0 0}
     </style>
   </head>
   <body>
@@ -53,7 +53,7 @@
       </header>
 
       <section class="hero">
-        <h1>Günlük astroloji ve stil rehberin</h1>
+        <h1>Günlük astroloji ve stil rehberi</h1>
         <p>Burcuna göre enerji, renk ve yönlendirme. Yükselenini ekleyerek kişiselleştir.</p>
       </section>
 
@@ -61,7 +61,7 @@
         <div class="panel">
           <div class="card">
             <div class="label">Güneş burcun ve gün</div>
-            <div class="row" style="margin-bottom:12px">
+            <div class="row" style="margin-bottom:8px">
               <select id="sun"></select>
               <select id="day">
                 <option value="today">Bugün</option>
@@ -71,15 +71,14 @@
             </div>
             <button id="go-daily" class="btn btn--brand" style="margin-bottom:10px">Günlük yorumu getir</button>
 
-            <div class="label" style="margin-top:10px">Yükselen (opsiyonel)</div>
-            <div class="row" style="margin-bottom:12px">
+            <div class="label" style="margin-top:6px">Yükselen (opsiyonel)</div>
+            <div class="row" style="margin-bottom:8px">
               <select id="rising"></select>
               <div></div>
             </div>
             <button id="go-personal" class="btn btn--accent">Kişisel rehberi getir</button>
-          </div>
-          <div class="card">
-            <div id="status" class="muted">Hazır.</div>
+
+            <div id="status" class="status" style="display:none">Hazır.</div>
           </div>
         </div>
 
@@ -116,33 +115,34 @@
       risingSel.insertAdjacentHTML("afterbegin", '<option value="">Seçim yok</option>');
       risingSel.value = "";
 
-      document.getElementById("go-daily").addEventListener("click", async () => {
-        await fetchDaily();
-      });
-      document.getElementById("go-personal").addEventListener("click", async () => {
-        await fetchPersonal();
-      });
+      document.getElementById("go-daily").addEventListener("click", fetchDaily);
+      document.getElementById("go-personal").addEventListener("click", fetchPersonal);
+
+      function showStatus(text){
+        statusEl.textContent = text;
+        statusEl.style.display = text ? "block" : "none";
+      }
 
       async function fetchDaily(){
         const base = window.location.origin;
         const url = `${base}/api/daily?sign=${encodeURIComponent(sunSel.value)}&day=${encodeURIComponent(daySel.value)}`;
-        statusEl.textContent = "Yükleniyor…";
+        showStatus("Yükleniyor…");
         result.innerHTML = "";
         try{
           const r = await fetch(url);
           if(!r.ok) throw new Error("İstek hata verdi");
           const d = await r.json();
           renderDaily(d);
-          statusEl.textContent = "Hazır.";
+          showStatus("");
         }catch(err){
-          statusEl.textContent = "Bir sorun oluştu.";
+          showStatus("");
           result.innerHTML = `<p class="muted">Hata: ${err.message}</p>`;
         }
       }
 
       async function fetchPersonal(){
         const base = window.location.origin;
-        statusEl.textContent = "Yükleniyor…";
+        showStatus("Yükleniyor…");
         result.innerHTML = "";
         try{
           const r = await fetch(`${base}/api/personalized`,{
@@ -152,15 +152,14 @@
               sun: sunSel.value,
               rising: risingSel.value || "",
               day: daySel.value
-              // ileride birth: { date, time, lat, lon, tz } eklenebilir
             })
           });
           if(!r.ok) throw new Error("İstek hata verdi");
           const d = await r.json();
           renderPersonal(d);
-          statusEl.textContent = "Hazır.";
+          showStatus("");
         }catch(err){
-          statusEl.textContent = "Bir sorun oluştu.";
+          showStatus("");
           result.innerHTML = `<p class="muted">Hata: ${err.message}</p>`;
         }
       }
