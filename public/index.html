@@ -4,12 +4,12 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>AstroVogue</title>
-    <meta name="description" content="Daily astrology and style guidance. Add your rising sign for a personalized read." />
+    <meta name="description" content="Your daily cosmic style guide. Personalized fashion and beauty tips from your birth chart." />
     <link rel="icon" href="/favicon.svg" />
     <style>
       :root{
         --paper:#faf7f2; --paper2:#ffffff; --ink:#0b0b0b; --muted:#6b6b6b;
-        --line:#e7e2da; --panel:#ffffff; --accent:#bfa980;
+        --line:#e7e2da; --panel:#ffffff; --accent:#bfa980; --accent2:#6b5b95;
         --radius:16px; --shadow:0 10px 30px rgba(0,0,0,.06);
       }
       *{box-sizing:border-box}
@@ -19,53 +19,90 @@
         font:16px/1.6 -apple-system,BlinkMacSystemFont,"Inter","Segoe UI",Roboto,Ubuntu,"Helvetica Neue",Arial,sans-serif;
         letter-spacing:.2px;
       }
-      .wrap{max-width:1000px; margin:0 auto; padding:32px 16px 64px}
-      header{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:22px}
+      .wrap{max-width:1100px; margin:0 auto; padding:24px 16px 64px}
+      header{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px}
       .brand{display:flex; align-items:center; gap:12px}
       .logo{width:36px; height:36px; border-radius:10px; background:var(--ink); display:grid; place-items:center; color:#fff; font-weight:700}
       .title{font:600 18px/1 "Georgia","Times New Roman",serif; letter-spacing:.5px}
-      /* language pills top-right */
+      /* language pills */
       .langbar{display:flex; gap:8px; align-items:center}
       .langpill{
         font:600 12px/1 "Inter",system-ui,sans-serif;
-        letter-spacing:.5px;
-        padding:8px 10px;
-        border:1px solid var(--line);
-        border-radius:999px;
-        background:#fff;
-        color:var(--ink);
-        cursor:pointer;
-        user-select:none;
+        letter-spacing:.5px; padding:8px 10px;
+        border:1px solid var(--line); border-radius:999px;
+        background:#fff; color:var(--ink);
+        cursor:pointer; user-select:none; transition:transform .06s ease
       }
-      .langpill.is-active{background:var(--ink); color:#fff; border-color:var(--ink)}
       .langpill:hover{transform:translateY(-1px)}
-      .hero{display:grid; gap:8px; margin:8px 0 18px}
-      .hero h1{margin:0; font:600 38px/1.15 "Georgia","Times New Roman",serif; letter-spacing:.2px}
-      .hero p{margin:0; color:var(--muted)}
-      .grid{display:grid; grid-template-columns:1.1fr 1fr; gap:20px}
-      @media (max-width:900px){ .grid{grid-template-columns:1fr} }
+      .langpill.is-active{background:var(--ink); color:#fff; border-color:var(--ink)}
+      /* hero */
+      .hero{
+        position:relative; overflow:hidden; border-radius:18px;
+        padding:28px; background:radial-gradient(1200px 300px at 70% -100%, #dcd3ff 0%, transparent 60%), linear-gradient(180deg, #fff 0%, #faf7f2 100%);
+        border:1px solid var(--line); box-shadow:var(--shadow); margin-bottom:18px
+      }
+      .hero h1{margin:0 0 10px 0; font:700 44px/1.1 "Georgia","Times New Roman",serif; letter-spacing:.2px}
+      .hero p{margin:0 0 18px 0; color:var(--muted)}
+      .cta-row{display:flex; gap:10px; flex-wrap:wrap}
+      .btn{appearance:none; border:1px solid var(--line); padding:12px 16px; border-radius:999px; cursor:pointer; font-weight:600}
+      .btn--brand{background:var(--ink); color:#fff; border-color:var(--ink)}
+      .btn--ghost{background:#fff}
+      /* subtle stars */
+      .stars{position:absolute; inset:0; pointer-events:none; background-image:radial-gradient(#cdbfff 1px, transparent 1px);}
+      .stars{background-size:28px 28px; opacity:.25; animation:twinkle 6s linear infinite}
+      @keyframes twinkle{0%{opacity:.18} 50%{opacity:.3} 100%{opacity:.18}}
+
+      /* main grid: controls + featured */
+      .gridA{display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-top:16px}
+      @media (max-width:900px){ .gridA{grid-template-columns:1fr} }
 
       .panel{background:var(--panel); border-radius:var(--radius); box-shadow:var(--shadow); border:1px solid var(--line)}
       .card{padding:18px}
       .label{font-size:13px; color:var(--muted); margin-bottom:6px}
-      select,button{appearance:none; border:1px solid var(--line); background:#fff; color:var(--ink);
+
+      select{appearance:none; border:1px solid var(--line); background:#fff; color:var(--ink);
         border-radius:12px; padding:12px 14px; font:inherit; width:100%}
       .row{display:grid; grid-template-columns:1fr 1fr; gap:12px}
-      .btn{cursor:pointer; transition:transform .06s ease, box-shadow .06s ease}
-      .btn:hover{transform:translateY(-1px)}
-      .btn--brand{background:var(--ink); color:#fff; border-color:var(--ink)}
-      .btn--accent{background:var(--accent); color:#fff; border-color:var(--accent)}
       .status{font-size:13px; color:var(--muted); padding-top:4px}
 
       .result{padding:18px; display:grid; gap:12px; min-height:120px}
       .result h3{margin:0 0 2px 0; font:600 20px/1.2 "Georgia","Times New Roman",serif}
-      .kv{display:grid; grid-template-columns:160px 1fr; gap:6px; padding-top:4px}
+      .kv{display:grid; grid-template-columns:150px 1fr; gap:6px; padding-top:4px}
       .muted{color:var(--muted)}
       .chip{display:inline-block; font-size:12px; color:#111; background:#f5f3ee; border:1px solid var(--line); padding:6px 10px; border-radius:999px}
       .divider{height:1px; background:var(--line); margin:6px 0 2px}
       .fade-in{animation:fade .2s ease both}
       @keyframes fade{from{opacity:0; transform:translateY(3px)} to{opacity:1; transform:none}}
-      footer{margin-top:22px; color:var(--muted); font-size:13px}
+
+      /* how it works */
+      .how{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin:22px 0}
+      @media (max-width:900px){ .how{grid-template-columns:1fr} }
+      .how .step{padding:16px; border-radius:14px; border:1px solid var(--line); background:#fff}
+
+      /* sample all-signs */
+      .signs{margin-top:8px}
+      .signs h2{font:600 24px/1.2 "Georgia","Times New Roman",serif; margin:0 0 10px 0}
+      .cards{display:grid; grid-template-columns:repeat(4,1fr); gap:14px}
+      @media (max-width:1100px){ .cards{grid-template-columns:repeat(3,1fr)} }
+      @media (max-width:780px){ .cards{grid-template-columns:repeat(2,1fr)} }
+      @media (max-width:480px){ .cards{grid-template-columns:1fr} }
+      .card-mini{
+        border:1px solid var(--line); border-radius:14px; padding:14px; background:#fff; display:grid; gap:6px
+      }
+      .badge{display:inline-flex; align-items:center; gap:6px; font-weight:600}
+      .badge .icon{width:28px; height:28px; border-radius:999px; display:grid; place-items:center; color:#fff;
+        background:linear-gradient(135deg,var(--accent2),#1f1b2e)}
+      .mini-line{font-size:13px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+      .mini-cta{font-size:13px; color:#1f1b2e; font-weight:600; cursor:pointer}
+
+      /* email capture */
+      .signup{margin:26px 0}
+      .signup .box{padding:16px; border:1px solid var(--line); background:#fff; border-radius:16px; display:grid; gap:12px}
+      .signup input[type="email"]{width:100%; padding:12px 14px; border:1px solid var(--line); border-radius:10px}
+      .btn--accent{background:var(--accent); color:#fff; border:1px solid var(--accent)}
+
+      footer{margin-top:26px; color:var(--muted); font-size:13px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px}
+      a.clean{color:inherit; text-decoration:none; border-bottom:1px solid #ddd}
     </style>
   </head>
   <body>
@@ -83,12 +120,19 @@
         </nav>
       </header>
 
-      <section class="hero">
-        <h1 id="t-headline">Daily astrology and style</h1>
-        <p id="t-tagline">Choose your sign. Add your rising for a more personal read.</p>
+      <!-- HERO -->
+      <section class="hero" id="hero">
+        <div class="stars"></div>
+        <h1 id="t-hero-head">Your Daily Cosmic Style Guide</h1>
+        <p id="t-hero-tag">Personalized fashion and beauty insights from your birth chart. Elegant, accurate, and updated every day.</p>
+        <div class="cta-row">
+          <button class="btn btn--brand" id="cta-get-reading">Get My Cosmic Style Reading</button>
+          <button class="btn btn--ghost" id="cta-subscribe">Get daily tips by email</button>
+        </div>
       </section>
 
-      <section class="grid">
+      <!-- CONTROLS + FEATURED -->
+      <section class="gridA">
         <!-- Controls -->
         <div class="panel">
           <div class="card">
@@ -97,7 +141,6 @@
               <select id="sun"></select>
               <select id="day"></select>
             </div>
-
             <button id="go-daily" class="btn btn--brand" style="margin-bottom:10px">Get daily reading</button>
 
             <div class="label" id="t-rising-label">Rising (optional)</div>
@@ -111,90 +154,128 @@
           </div>
         </div>
 
-        <!-- Results -->
+        <!-- Featured sign -->
         <div class="panel">
-          <div class="result" id="result">
-            <h3 id="t-default-title">Today’s reading</h3>
-            <p class="muted" id="t-default-help">Pick your sign. Add rising if you like.</p>
+          <div class="result" id="featured">
+            <h3 id="featured-title">Featured sign</h3>
+            <p class="muted" id="featured-desc">Today’s highlight will appear here after sample content loads.</p>
           </div>
         </div>
       </section>
 
+      <!-- How it works -->
+      <section class="how" id="how">
+        <div class="step">
+          <strong>1. Pick your sign</strong>
+          <p class="muted">Or add your rising for a sharper read.</p>
+        </div>
+        <div class="step">
+          <strong>2. Read and act</strong>
+          <p class="muted">Get mood, color and outfit vibes that fit the day.</p>
+        </div>
+        <div class="step">
+          <strong>3. Go deeper</strong>
+          <p class="muted">Unlock weekly alerts and chart reports with Premium.</p>
+        </div>
+      </section>
+
+      <!-- Sample content grid -->
+      <section class="signs">
+        <h2 id="t-today-all">Today’s Cosmic Style for Every Sign</h2>
+        <div class="cards" id="sample-cards"></div>
+      </section>
+
+      <!-- Email capture -->
+      <section class="signup" id="signup">
+        <div class="box">
+          <strong id="t-email-title">Get daily cosmic style tips</strong>
+          <p class="muted" id="t-email-copy">Short, elegant emails with your color, vibe and ritual. Free to join.</p>
+          <form id="emailForm">
+            <div class="row" style="grid-template-columns:2fr 1fr">
+              <input type="email" id="email" placeholder="you@example.com" required />
+              <button class="btn btn--accent" type="submit" id="t-email-btn">Subscribe</button>
+            </div>
+            <div id="emailStatus" class="status"></div>
+          </form>
+        </div>
+      </section>
+
       <footer>
-        <p>© AstroVogue</p>
+        <span>© AstroVogue</span>
+        <span>
+          <a class="clean" href="#" title="Instagram">Instagram</a> ·
+          <a class="clean" href="#" title="X">X</a> ·
+          <a class="clean" href="#" title="Contact">Contact</a>
+        </span>
       </footer>
     </div>
 
     <script>
-      // i18n dictionary
+      // i18n
       const i18n = {
         en: {
-          headline: "Daily astrology and style",
-          tagline: "Choose your sign. Add your rising for a more personal read.",
+          heroHead: "Your Daily Cosmic Style Guide",
+          heroTag: "Personalized fashion and beauty insights from your birth chart. Elegant, accurate, and updated every day.",
           sunDayLabel: "Sun sign and day",
           risingLabel: "Rising (optional)",
           btnDaily: "Get daily reading",
           btnPersonal: "Get personal guidance",
-          defaultTitle: "Today’s reading",
-          defaultHelp: "Pick your sign. Add rising if you like.",
-          kv: { compat: "Compatibility", mood: "Mood", color: "Color", luckyNum: "Lucky number", luckyTime: "Lucky time", focus: "Focus" },
+          todayAll: "Today’s Cosmic Style for Every Sign",
+          emailTitle: "Get daily cosmic style tips",
+          emailCopy: "Short, elegant emails with your color, vibe and ritual. Free to join.",
+          emailBtn: "Subscribe",
+          loading: "Loading…", selectSign: "Select a sign",
           days: [{v:"today",t:"Today"},{v:"tomorrow",t:"Tomorrow"},{v:"yesterday",t:"Yesterday"}],
-          signs: {
-            aries:"Aries", taurus:"Taurus", gemini:"Gemini", cancer:"Cancer", leo:"Leo", virgo:"Virgo",
-            libra:"Libra", scorpio:"Scorpio", sagittarius:"Sagittarius", capricorn:"Capricorn", aquarius:"Aquarius", pisces:"Pisces"
-          },
-          loading: "Loading…", selectSign: "Select a sign"
+          signs: { aries:"Aries", taurus:"Taurus", gemini:"Gemini", cancer:"Cancer", leo:"Leo", virgo:"Virgo", libra:"Libra", scorpio:"Scorpio", sagittarius:"Sagittarius", capricorn:"Capricorn", aquarius:"Aquarius", pisces:"Pisces" },
+          kv: { compat: "Compatibility", mood: "Mood", color: "Color", luckyNum: "Lucky number", luckyTime: "Lucky time", focus: "Focus" }
         },
         tr: {
-          headline: "Günlük astroloji ve stil",
-          tagline: "Burcunu seç. Yükseleni ekleyerek kişiselleştir.",
+          heroHead: "Günlük Kozmik Stil Rehberin",
+          heroTag: "Doğum haritandan kişisel moda ve güzellik içgörüleri. Zarif, net ve her gün güncel.",
           sunDayLabel: "Güneş burcun ve gün",
           risingLabel: "Yükselen (opsiyonel)",
           btnDaily: "Günlük yorumu getir",
           btnPersonal: "Kişisel rehberi getir",
-          defaultTitle: "Bugünün yorumu",
-          defaultHelp: "Güneş burcunu seç. İstersen yükseleni ekle.",
-          kv: { compat: "Uyum", mood: "Ruh hali", color: "Renk", luckyNum: "Şanslı sayı", luckyTime: "Şanslı saat", focus: "Odak" },
+          todayAll: "Bugün tüm burçlar için kozmik stil",
+          emailTitle: "Günlük kozmik stil ipuçları",
+          emailCopy: "Günlük renk, ruh ve ritüel özetleri. Ücretsiz.",
+          emailBtn: "Abone ol",
+          loading: "Yükleniyor…", selectSign: "Burç seç",
           days: [{v:"today",t:"Bugün"},{v:"tomorrow",t:"Yarın"},{v:"yesterday",t:"Dün"}],
-          signs: {
-            aries:"Koç", taurus:"Boğa", gemini:"İkizler", cancer:"Yengeç", leo:"Aslan", virgo:"Başak",
-            libra:"Terazi", scorpio:"Akrep", sagittarius:"Yay", capricorn:"Oğlak", aquarius:"Kova", pisces:"Balık"
-          },
-          loading: "Yükleniyor…", selectSign: "Burç seç"
+          signs: { aries:"Koç", taurus:"Boğa", gemini:"İkizler", cancer:"Yengeç", leo:"Aslan", virgo:"Başak", libra:"Terazi", scorpio:"Akrep", sagittarius:"Yay", capricorn:"Oğlak", aquarius:"Kova", pisces:"Balık" },
+          kv: { compat:"Uyum", mood:"Ruh hali", color:"Renk", luckyNum:"Şanslı sayı", luckyTime:"Şanslı saat", focus:"Odak" }
         },
         es: {
-          headline: "Astrología y estilo diarios",
-          tagline: "Elige tu signo. Añade tu ascendente para un toque personal.",
+          heroHead: "Tu guía cósmica de estilo diaria",
+          heroTag: "Consejos de moda y belleza basados en tu carta natal. Elegante, preciso y actualizado a diario.",
           sunDayLabel: "Signo solar y día",
           risingLabel: "Ascendente (opcional)",
           btnDaily: "Leer del día",
           btnPersonal: "Guía personal",
-          defaultTitle: "Lectura de hoy",
-          defaultHelp: "Elige tu signo. Añade ascendente si quieres.",
-          kv: { compat: "Compatibilidad", mood: "Estado de ánimo", color: "Color", luckyNum: "Número de la suerte", luckyTime: "Hora de la suerte", focus: "Enfoque" },
+          todayAll: "Estilo cósmico de hoy para cada signo",
+          emailTitle: "Recibe consejos cósmicos diarios",
+          emailCopy: "Correos breves con tu color, vibra y ritual. Gratis.",
+          emailBtn: "Suscribirme",
+          loading: "Cargando…", selectSign: "Elige un signo",
           days: [{v:"today",t:"Hoy"},{v:"tomorrow",t:"Mañana"},{v:"yesterday",t:"Ayer"}],
-          signs: {
-            aries:"Aries", taurus:"Tauro", gemini:"Géminis", cancer:"Cáncer", leo:"Leo", virgo:"Virgo",
-            libra:"Libra", scorpio:"Escorpio", sagittarius:"Sagitario", capricorn:"Capricornio", aquarius:"Acuario", pisces:"Piscis"
-          },
-          loading: "Cargando…", selectSign: "Elige un signo"
+          signs: { aries:"Aries", taurus:"Tauro", gemini:"Géminis", cancer:"Cáncer", leo:"Leo", virgo:"Virgo", libra:"Libra", scorpio:"Escorpio", sagittarius:"Sagitario", capricorn:"Capricornio", aquarius:"Acuario", pisces:"Piscis" },
+          kv: { compat:"Compatibilidad", mood:"Estado de ánimo", color:"Color", luckyNum:"Número de la suerte", luckyTime:"Hora de la suerte", focus:"Enfoque" }
         },
         dk: {
-          headline: "Daglig astrologi og stil",
-          tagline: "Vælg dit tegn. Tilføj ascendant for et mere personligt læsning.",
+          heroHead: "Din daglige kosmiske stilguide",
+          heroTag: "Personlige mode og beauty indsigter fra din fødselshoroskop. Elegant, præcis og opdateret hver dag.",
           sunDayLabel: "Solsign og dag",
           risingLabel: "Ascendant (valgfri)",
           btnDaily: "Hent dagens læsning",
           btnPersonal: "Hent personlig vejledning",
-          defaultTitle: "Dagens læsning",
-          defaultHelp: "Vælg dit tegn. Tilføj ascendant hvis du vil.",
-          kv: { compat: "Kompatibilitet", mood: "Humør", color: "Farve", luckyNum: "Lykketallet", luckyTime: "Lykketid", focus: "Fokus" },
+          todayAll: "Dagens kosmiske stil for alle tegn",
+          emailTitle: "Få daglige kosmiske stil-tips",
+          emailCopy: "Korte, elegante mails med farve, vibe og ritual. Gratis.",
+          emailBtn: "Tilmeld",
+          loading: "Indlæser…", selectSign: "Vælg et tegn",
           days: [{v:"today",t:"I dag"},{v:"tomorrow",t:"I morgen"},{v:"yesterday",t:"I går"}],
-          signs: {
-            aries:"Vædder", taurus:"Tyr", gemini:"Tvilling", cancer:"Krebs", leo:"Løve", virgo:"Jomfru",
-            libra:"Vægt", scorpio:"Skorpion", sagittarius:"Skytte", capricorn:"Stenbuk", aquarius:"Vandbærer", pisces:"Fisk"
-          },
-          loading: "Indlæser…", selectSign: "Vælg et tegn"
+          signs: { aries:"Vædder", taurus:"Tyr", gemini:"Tvilling", cancer:"Krebs", leo:"Løve", virgo:"Jomfru", libra:"Vægt", scorpio:"Skorpion", sagittarius:"Skytte", capricorn:"Stenbuk", aquarius:"Vandbærer", pisces:"Fisk" },
+          kv: { compat:"Kompatibilitet", mood:"Humør", color:"Farve", luckyNum:"Lykketallet", luckyTime:"Lykketid", focus:"Fokus" }
         }
       };
 
@@ -203,23 +284,51 @@
       const risingSel = document.getElementById("rising");
       const daySel = document.getElementById("day");
       const statusEl = document.getElementById("status");
-      const result = document.getElementById("result");
-      const elHeadline = document.getElementById("t-headline");
-      const elTagline = document.getElementById("t-tagline");
-      const elSunDayLabel = document.getElementById("t-sun-day-label");
-      const elRisingLabel = document.getElementById("t-rising-label");
+      const langPills = Array.from(document.querySelectorAll(".langpill"));
+
+      const heroHead = document.getElementById("t-hero-head");
+      const heroTag = document.getElementById("t-hero-tag");
+      const sunDayLabel = document.getElementById("t-sun-day-label");
+      const risingLabel = document.getElementById("t-rising-label");
       const btnDaily = document.getElementById("go-daily");
       const btnPersonal = document.getElementById("go-personal");
-      const defaultTitle = document.getElementById("t-default-title");
-      const defaultHelp = document.getElementById("t-default-help");
-      const langPills = Array.from(document.querySelectorAll(".langpill"));
+      const headingTodayAll = document.getElementById("t-today-all");
+      const emailTitle = document.getElementById("t-email-title");
+      const emailCopy = document.getElementById("t-email-copy");
+      const emailBtn = document.getElementById("t-email-btn");
+
+      const featured = document.getElementById("featured");
+      const sampleCards = document.getElementById("sample-cards");
+      const emailForm = document.getElementById("emailForm");
+      const emailInput = document.getElementById("email");
+      const emailStatus = document.getElementById("emailStatus");
+
+      // hero CTAs
+      document.getElementById("cta-get-reading").addEventListener("click", () => {
+        document.getElementById("sun").scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+      document.getElementById("cta-subscribe").addEventListener("click", () => {
+        document.getElementById("signup").scrollIntoView({ behavior: "smooth", block: "start" });
+      });
 
       let currentLang = "en";
 
       function setActiveLangPill(lang){
         langPills.forEach(p => p.classList.toggle("is-active", p.dataset.lang === lang));
       }
-
+      function setUIText(lang){
+        const t = i18n[lang];
+        heroHead.textContent = t.heroHead;
+        heroTag.textContent = t.heroTag;
+        sunDayLabel.textContent = t.sunDayLabel;
+        risingLabel.textContent = t.risingLabel;
+        btnDaily.textContent = t.btnDaily;
+        btnPersonal.textContent = t.btnPersonal;
+        headingTodayAll.textContent = t.todayAll;
+        emailTitle.textContent = t.emailTitle;
+        emailCopy.textContent = t.emailCopy;
+        emailBtn.textContent = t.emailBtn;
+      }
       function renderDayOptions(lang) {
         daySel.innerHTML = "";
         i18n[lang].days.forEach(d => {
@@ -245,63 +354,46 @@
         fill(sunSel,false);
         fill(risingSel,true);
       }
-      function setUIText(lang){
-        const t = i18n[lang];
-        elHeadline.textContent = t.headline;
-        elTagline.textContent = t.tagline;
-        elSunDayLabel.textContent = t.sunDayLabel;
-        elRisingLabel.textContent = t.risingLabel;
-        btnDaily.textContent = t.btnDaily;
-        btnPersonal.textContent = t.btnPersonal;
-        defaultTitle.textContent = t.defaultTitle;
-        defaultHelp.textContent = t.defaultHelp;
-      }
       function initLanguage(lang){
         currentLang = lang;
         setActiveLangPill(lang);
-        const prevSun = sunSel.value;
-        const prevRising = risingSel.value;
         setUIText(lang);
         renderDayOptions(lang);
         renderSignOptions(lang);
-        if (prevSun) sunSel.value = prevSun;
-        if (prevRising) risingSel.value = prevRising;
-        statusEl.textContent = "";
       }
-
-      // init default English
+      // init
       initLanguage("en");
 
       langPills.forEach(pill=>{
         pill.addEventListener("click", ()=>{
           const lang = pill.dataset.lang;
-          if (lang !== currentLang) initLanguage(lang);
+          if (lang !== currentLang){
+            initLanguage(lang);
+            loadSamples(); // reload sample grid in the new language
+          }
         });
       });
 
+      // API helpers
+      function showStatus(t){ statusEl.textContent = t || ""; }
+      function signLabel(code){ return i18n[currentLang].signs[code] || code; }
+
       document.getElementById("go-daily").addEventListener("click", fetchDaily);
       document.getElementById("go-personal").addEventListener("click", fetchPersonal);
-
-      function showStatus(t){ statusEl.textContent = t || ""; }
-      function displaySignLabel(code){ return i18n[currentLang].signs[code] || code; }
-      function kvLabel(key){ return i18n[currentLang].kv[key]; }
 
       async function fetchDaily(){
         const sign = sunSel.value;
         const day = daySel.value;
         if (!sign) { showStatus(i18n[currentLang].selectSign); return; }
         showStatus(i18n[currentLang].loading);
-        result.innerHTML = "";
         try{
           const base = window.location.origin;
           const url = `${base}/api/daily?sign=${encodeURIComponent(sign)}&day=${encodeURIComponent(day)}&lang=${encodeURIComponent(currentLang)}`;
           const r = await fetch(url);
-          if(!r.ok) throw new Error("Request failed");
           const d = await r.json();
-          renderDaily(d);
-        }catch(e){
-          result.innerHTML = `<p class="muted">${e.message}</p>`;
-        }finally{ showStatus(""); }
+          renderFeaturedFromDaily(d, sign);
+        } catch(e){ console.error(e); }
+        finally{ showStatus(""); }
       }
 
       async function fetchPersonal(){
@@ -310,7 +402,6 @@
         const day = daySel.value;
         if (!sun) { showStatus(i18n[currentLang].selectSign); return; }
         showStatus(i18n[currentLang].loading);
-        result.innerHTML = "";
         try{
           const base = window.location.origin;
           const r = await fetch(`${base}/api/personalized`,{
@@ -318,54 +409,114 @@
             headers:{ "Content-Type":"application/json" },
             body: JSON.stringify({ sun, rising, day, lang: currentLang })
           });
-          if(!r.ok) throw new Error("Request failed");
           const d = await r.json();
-          renderPersonal(d);
-        }catch(e){
-          result.innerHTML = `<p class="muted">${e.message}</p>`;
-        }finally{ showStatus(""); }
+          renderFeaturedFromPersonal(d);
+        } catch(e){ console.error(e); }
+        finally{ showStatus(""); }
       }
 
-      function renderDaily(d){
-        const title = `${displaySignLabel(d.sign)} | ${d.date}`;
+      function renderFeaturedFromDaily(d, signCode){
         const html = `
           <div class="fade-in">
-            <h3>${title}</h3>
+            <h3>${signLabel(signCode)} | ${d.date}</h3>
             <p>${d.description || ""}</p>
-
             <div class="kv">
-              <div class="muted">${kvLabel("compat")}</div><div>${d.compatibility || "-"}</div>
-              <div class="muted">${kvLabel("mood")}</div><div>${d.mood || "-"}</div>
-              <div class="muted">${kvLabel("color")}</div><div><span class="chip">${d.color || "-"}</span></div>
-              <div class="muted">${kvLabel("luckyNum")}</div><div>${d.lucky_number || "-"}</div>
-              <div class="muted">${kvLabel("luckyTime")}</div><div>${d.lucky_time || "-"}</div>
+              <div class="muted">${i18n[currentLang].kv.color}</div><div><span class="chip">${d.color || "-"}</span></div>
+              <div class="muted">${i18n[currentLang].kv.mood}</div><div>${d.mood || "-"}</div>
+              <div class="muted">${i18n[currentLang].kv.luckyNum}</div><div>${d.lucky_number || "-"}</div>
+              <div class="muted">${i18n[currentLang].kv.luckyTime}</div><div>${d.lucky_time || "-"}</div>
             </div>
-
             <div class="divider"></div>
             <p>${[d.paragraph, d.fashion_tip].filter(Boolean).join(" ")}</p>
           </div>`;
-        result.innerHTML = html;
+        featured.innerHTML = html;
       }
 
-      function renderPersonal(d){
-        const title = `${displaySignLabel(d.sun)}${d.rising ? " ↑ " + displaySignLabel(d.rising) : ""} | ${d.date}`;
+      function renderFeaturedFromPersonal(d){
+        const title = `${signLabel(d.sun)}${d.rising ? " ↑ " + signLabel(d.rising) : ""} | ${d.date}`;
         const html = `
           <div class="fade-in">
             <h3>${title}</h3>
             <p>${d.summary || ""}</p>
-
             <div class="kv">
-              <div class="muted">${kvLabel("focus")}</div><div>${d.guidance ? d.guidance.split(".")[0] : "-"}</div>
-              <div class="muted">${kvLabel("mood")}</div><div>${d.mood || "-"}</div>
-              <div class="muted">${kvLabel("color")}</div><div><span class="chip">${d.color || "-"}</span></div>
-              <div class="muted">${kvLabel("compat")}</div><div>${d.compatibility || "-"}</div>
+              <div class="muted">${i18n[currentLang].kv.focus}</div><div>${d.guidance ? d.guidance.split(".")[0] : "-"}</div>
+              <div class="muted">${i18n[currentLang].kv.mood}</div><div>${d.mood || "-"}</div>
+              <div class="muted">${i18n[currentLang].kv.color}</div><div><span class="chip">${d.color || "-"}</span></div>
+              <div class="muted">${i18n[currentLang].kv.compat}</div><div>${d.compatibility || "-"}</div>
             </div>
-
             <div class="divider"></div>
             <p>${[d.paragraph, d.fashion_tip].filter(Boolean).join(" ")}</p>
           </div>`;
-        result.innerHTML = html;
+        featured.innerHTML = html;
       }
+
+      // Sample grid for all 12 signs
+      const SIGN_CODES = ["aries","taurus","gemini","cancer","leo","virgo","libra","scorpio","sagittarius","capricorn","aquarius","pisces"];
+      async function loadSamples(){
+        sampleCards.innerHTML = "";
+        const base = window.location.origin;
+        const tasks = SIGN_CODES.map(code =>
+          fetch(`${base}/api/daily?sign=${code}&day=today&lang=${currentLang}`)
+            .then(r=>r.json())
+            .then(d => ({ code, d }))
+            .catch(()=>null)
+        );
+        const results = await Promise.all(tasks);
+        // pick one as featured if none selected yet
+        const firstGood = results.find(x => x && x.d && x.d.description);
+        if (firstGood) renderFeaturedFromDaily(firstGood.d, firstGood.code);
+
+        results.filter(Boolean).forEach(({code,d})=>{
+          const el = document.createElement("div");
+          el.className = "card-mini";
+          el.innerHTML = `
+            <div class="badge"><span class="icon">${signIcon(code)}</span> ${signLabel(code)}</div>
+            <div class="mini-line">${d.description || ""}</div>
+            <div class="mini-line"><strong>${i18n[currentLang].kv.color}:</strong> ${d.color || "-"}</div>
+            <div class="mini-line"><strong>${i18n[currentLang].kv.mood}:</strong> ${d.mood || "-"}</div>
+            <div class="mini-cta" data-sign="${code}">Read more</div>
+          `;
+          el.querySelector(".mini-cta").addEventListener("click", async () => {
+            renderFeaturedFromDaily(d, code);
+            document.getElementById("hero").scrollIntoView({ behavior: "smooth", block: "start" });
+          });
+          sampleCards.appendChild(el);
+        });
+      }
+
+      function signIcon(code){
+        const map = {
+          aries:"♈", taurus:"♉", gemini:"♊", cancer:"♋",
+          leo:"♌", virgo:"♍", libra:"♎", scorpio:"♏",
+          sagittarius:"♐", capricorn:"♑", aquarius:"♒", pisces:"♓"
+        };
+        return map[code] || "★";
+      }
+
+      // Email capture (simple POST; implement /api/subscribe server-side)
+      emailForm.addEventListener("submit", async (e)=>{
+        e.preventDefault();
+        emailStatus.textContent = i18n[currentLang].loading;
+        try{
+          const base = window.location.origin;
+          const r = await fetch(`${base}/api/subscribe`,{
+            method:"POST",
+            headers:{ "Content-Type":"application/json" },
+            body: JSON.stringify({ email: emailInput.value, lang: currentLang })
+          });
+          if (r.ok){
+            emailStatus.textContent = "Thanks. You are on the list.";
+            emailInput.value = "";
+          } else {
+            emailStatus.textContent = "Could not subscribe right now.";
+          }
+        }catch(_){
+          emailStatus.textContent = "Could not subscribe right now.";
+        }
+      });
+
+      // load initial sample grid
+      loadSamples();
     </script>
   </body>
 </html>
