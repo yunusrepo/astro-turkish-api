@@ -1,0 +1,15 @@
+{
+  "name": "astro-turkish-api",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "node-fetch": "^3.3.2",
+    "morgan": "^1.10.0"
+  }
+}
