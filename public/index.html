@@ -3,22 +3,18 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Astro Reader</title>
-    <meta name="description" content="Günlük burç yorumları ve kısa analizler." />
+    <title>AstroVogue</title>
+    <meta name="description" content="Günlük burç ve stil rehberi. Güneş ve yükselen etkisiyle net yönlendirme." />
     <link rel="icon" href="/favicon.svg" />
     <style>
       :root{
         --bg:#f7f7f7; --panel:#ffffff; --ink:#0f1115; --muted:#6b7280;
         --line:#e5e7eb; --brand:#111827; --radius:16px;
-        --shadow:0 6px 30px rgba(0,0,0,0.06);
+        --shadow:0 6px 30px rgba(0,0,0,0.06); --accent:#bfa980;
       }
       *{box-sizing:border-box}
-      html,body{height:100%}
-      body{
-        margin:0; background:var(--bg); color:var(--ink);
-        font:16px/1.6 -apple-system,BlinkMacSystemFont,"Inter","Segoe UI",Roboto,Ubuntu,"Helvetica Neue",Arial,"Apple Color Emoji","Segoe UI Emoji",sans-serif;
-        letter-spacing:0.2px;
-      }
+      body{margin:0; background:var(--bg); color:var(--ink);
+        font:16px/1.6 -apple-system,BlinkMacSystemFont,"Inter","Segoe UI",Roboto,Ubuntu,"Helvetica Neue",Arial,sans-serif}
       .wrap{max-width:1000px; margin:0 auto; padding:40px 20px 80px}
       header{display:flex; align-items:center; gap:12px; margin-bottom:40px}
       .logo{width:36px; height:36px; border-radius:10px; background:var(--ink); display:grid; place-items:center; color:#fff; font-weight:600}
@@ -32,11 +28,13 @@
       .card{padding:20px}
       .card + .card{border-top:1px solid var(--line)}
       .label{font-size:13px; color:var(--muted); margin-bottom:8px}
-      select,button{appearance:none; border:1px solid var(--line); background:#fff; color:var(--ink); border-radius:12px; padding:12px 14px; font:inherit; width:100%}
+      select,button{appearance:none; border:1px solid var(--line); background:#fff; color:var(--ink);
+        border-radius:12px; padding:12px 14px; font:inherit; width:100%}
       .row{display:grid; grid-template-columns:1fr 1fr; gap:12px}
       .btn{cursor:pointer; transition:transform .06s ease, box-shadow .06s ease}
       .btn:hover{transform:translateY(-1px)}
-      .btn--brand{background:var(--ink); color:#fff; border-color:var(--ink); box-shadow:0 8px 20px rgba(15,17,21,0.12)}
+      .btn--brand{background:var(--ink); color:#fff; border-color:var(--ink)}
+      .btn--accent{background:var(--accent); color:#fff; border-color:var(--accent)}
       .muted{color:var(--muted)}
       .result{padding:20px; display:grid; gap:10px; min-height:120px}
       .result h3{margin:0 0 4px 0; font-size:18px}
@@ -45,47 +43,40 @@
       footer{margin-top:28px; color:var(--muted); font-size:13px}
       .fade-in{animation:fade .25s ease both}
       @keyframes fade{from{opacity:0; transform:translateY(3px)} to{opacity:1; transform:none}}
-      a.brand{display:flex; align-items:center; gap:12px; text-decoration:none; color:inherit}
     </style>
   </head>
   <body>
     <div class="wrap">
       <header>
-        <div class="logo">AR</div>
-        <div class="title">Astro Reader</div>
+        <div class="logo">AV</div>
+        <div class="title">AstroVogue</div>
       </header>
 
       <section class="hero">
-        <h1>Günlük burç yorumun burada</h1>
-        <p>Sade ve şık tasarımda günlük yorumlar, renkli ipuçları ve mini analizler. Burcunu seç, hemen gör.</p>
+        <h1>Günlük astroloji ve stil rehberin</h1>
+        <p>Burcuna göre enerji, renk ve yönlendirme. Yükselenini ekleyerek kişiselleştir.</p>
       </section>
 
       <section class="grid">
         <div class="panel">
           <div class="card">
-            <div class="label">Burç ve gün</div>
+            <div class="label">Güneş burcun ve gün</div>
             <div class="row" style="margin-bottom:12px">
-              <select id="sign">
-                <option value="aries">Koç</option>
-                <option value="taurus">Boğa</option>
-                <option value="gemini">İkizler</option>
-                <option value="cancer">Yengeç</option>
-                <option value="leo">Aslan</option>
-                <option value="virgo">Başak</option>
-                <option value="libra">Terazi</option>
-                <option value="scorpio">Akrep</option>
-                <option value="sagittarius">Yay</option>
-                <option value="capricorn">Oğlak</option>
-                <option value="aquarius">Kova</option>
-                <option value="pisces">Balık</option>
-              </select>
+              <select id="sun"></select>
               <select id="day">
                 <option value="today">Bugün</option>
                 <option value="tomorrow">Yarın</option>
                 <option value="yesterday">Dün</option>
               </select>
             </div>
-            <button id="go" class="btn btn--brand">Analizi getir</button>
+            <button id="go-daily" class="btn btn--brand" style="margin-bottom:10px">Günlük yorumu getir</button>
+
+            <div class="label" style="margin-top:10px">Yükselen (opsiyonel)</div>
+            <div class="row" style="margin-bottom:12px">
+              <select id="rising"></select>
+              <div></div>
+            </div>
+            <button id="go-personal" class="btn btn--accent">Kişisel rehberi getir</button>
           </div>
           <div class="card">
             <div id="status" class="muted">Hazır.</div>
@@ -95,53 +86,119 @@
         <div class="panel">
           <div class="result" id="result">
             <h3>Bugünün yorumu</h3>
-            <p class="muted">Burcunuzu seçin, Analizi getir’e dokunun.</p>
+            <p class="muted">Güneş burcunu seç. İstersen yükseleni ekle.</p>
           </div>
         </div>
       </section>
 
       <footer>
-        <p>© Astro Reader. Her gün yenilenen yorumlar.</p>
+        <p>© AstroVogue. Her gün yenilenen yorumlar.</p>
       </footer>
     </div>
 
     <script>
-      const go = document.getElementById("go");
-      const result = document.getElementById("result");
+      const SIGNS = [
+        ["aries","Koç"],["taurus","Boğa"],["gemini","İkizler"],["cancer","Yengeç"],
+        ["leo","Aslan"],["virgo","Başak"],["libra","Terazi"],["scorpio","Akrep"],
+        ["sagittarius","Yay"],["capricorn","Oğlak"],["aquarius","Kova"],["pisces","Balık"]
+      ];
+
+      const sunSel = document.getElementById("sun");
+      const risingSel = document.getElementById("rising");
+      const daySel = document.getElementById("day");
       const statusEl = document.getElementById("status");
-      const sign = document.getElementById("sign");
-      const day = document.getElementById("day");
+      const result = document.getElementById("result");
+
+      for (const [v,t] of SIGNS){
+        const o1 = document.createElement("option"); o1.value=v; o1.textContent=t; sunSel.appendChild(o1);
+        const o2 = document.createElement("option"); o2.value=v; o2.textContent=t; risingSel.appendChild(o2);
+      }
+      risingSel.insertAdjacentHTML("afterbegin", '<option value="">Seçim yok</option>');
+      risingSel.value = "";
+
+      document.getElementById("go-daily").addEventListener("click", async () => {
+        await fetchDaily();
+      });
+      document.getElementById("go-personal").addEventListener("click", async () => {
+        await fetchPersonal();
+      });
 
       async function fetchDaily(){
         const base = window.location.origin;
-        const url = `${base}/api/daily?sign=${encodeURIComponent(sign.value)}&day=${encodeURIComponent(day.value)}`;
+        const url = `${base}/api/daily?sign=${encodeURIComponent(sunSel.value)}&day=${encodeURIComponent(daySel.value)}`;
         statusEl.textContent = "Yükleniyor…";
         result.innerHTML = "";
         try{
           const r = await fetch(url);
           if(!r.ok) throw new Error("İstek hata verdi");
           const d = await r.json();
-          const html = `
-            <div class="fade-in">
-              <h3>${d.burc} — ${d.tarih}</h3>
-              <p>${d.aciklama}</p>
-              <div class="kv">
-                <div class="muted">Uyum</div><div>${d.uyum || "-"}</div>
-                <div class="muted">Ruh hali</div><div>${d.ruh_hali || "-"}</div>
-                <div class="muted">Renk</div><div><span class="chip">${d.renk || "-"}</span></div>
-                <div class="muted">Şanslı sayı</div><div>${d.sansli_sayi || "-"}</div>
-                <div class="muted">Şanslı saat</div><div>${d.sansli_saat || "-"}</div>
-              </div>
-              <p><strong>Analiz:</strong> ${d.analiz}</p>
-            </div>`;
-          result.innerHTML = html;
+          renderDaily(d);
           statusEl.textContent = "Hazır.";
         }catch(err){
           statusEl.textContent = "Bir sorun oluştu.";
           result.innerHTML = `<p class="muted">Hata: ${err.message}</p>`;
         }
       }
-      go.addEventListener("click", fetchDaily);
+
+      async function fetchPersonal(){
+        const base = window.location.origin;
+        statusEl.textContent = "Yükleniyor…";
+        result.innerHTML = "";
+        try{
+          const r = await fetch(`${base}/api/personalized`,{
+            method:"POST",
+            headers:{ "Content-Type":"application/json" },
+            body: JSON.stringify({
+              sun: sunSel.value,
+              rising: risingSel.value || "",
+              day: daySel.value
+              // ileride birth: { date, time, lat, lon, tz } eklenebilir
+            })
+          });
+          if(!r.ok) throw new Error("İstek hata verdi");
+          const d = await r.json();
+          renderPersonal(d);
+          statusEl.textContent = "Hazır.";
+        }catch(err){
+          statusEl.textContent = "Bir sorun oluştu.";
+          result.innerHTML = `<p class="muted">Hata: ${err.message}</p>`;
+        }
+      }
+
+      function renderDaily(d){
+        const html = `
+          <div class="fade-in">
+            <h3>${d.burc} — ${d.tarih}</h3>
+            <p>${d.aciklama}</p>
+            <div class="kv">
+              <div class="muted">Uyum</div><div>${d.uyum || "-"}</div>
+              <div class="muted">Ruh hali</div><div>${d.ruh_hali || "-"}</div>
+              <div class="muted">Renk</div><div><span class="chip">${d.renk || "-"}</span></div>
+              <div class="muted">Şanslı sayı</div><div>${d.sansli_sayi || "-"}</div>
+              <div class="muted">Şanslı saat</div><div>${d.sansli_saat || "-"}</div>
+            </div>
+            <p><strong>Analiz:</strong> ${d.analiz}</p>
+            <p><strong>Stil:</strong> ${d.moda_onerisi}</p>
+          </div>`;
+        result.innerHTML = html;
+      }
+
+      function renderPersonal(d){
+        const html = `
+          <div class="fade-in">
+            <h3>${d.gunes}${d.yukselen ? " ↑ " + d.yukselen : ""} — ${d.tarih}</h3>
+            <p>${d.aciklama}</p>
+            <div class="kv">
+              <div class="muted">Odak</div><div>${d.odak || "-"}</div>
+              <div class="muted">Ruh hali</div><div>${d.ruh_hali || "-"}</div>
+              <div class="muted">Renk</div><div><span class="chip">${d.renk || "-"}</span></div>
+              <div class="muted">Uyum</div><div>${d.uyum || "-"}</div>
+            </div>
+            <p><strong>Rehber:</strong> ${d.rehber}</p>
+            <p><strong>Stil:</strong> ${d.stil}</p>
+          </div>`;
+        result.innerHTML = html;
+      }
     </script>
   </body>
 </html>
