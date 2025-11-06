@@ -8,7 +8,6 @@
     <link rel="icon" href="/favicon.svg" />
     <style>
       :root{
-        /* Vogue-like palette */
         --paper:#faf7f2; --paper2:#ffffff; --ink:#0b0b0b; --muted:#6b6b6b;
         --line:#e7e2da; --panel:#ffffff; --accent:#bfa980;
         --radius:16px; --shadow:0 10px 30px rgba(0,0,0,.06);
@@ -21,9 +20,25 @@
         letter-spacing:.2px;
       }
       .wrap{max-width:1000px; margin:0 auto; padding:32px 16px 64px}
-      header{display:flex; align-items:center; gap:12px; margin-bottom:22px}
+      header{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:22px}
+      .brand{display:flex; align-items:center; gap:12px}
       .logo{width:36px; height:36px; border-radius:10px; background:var(--ink); display:grid; place-items:center; color:#fff; font-weight:700}
       .title{font:600 18px/1 "Georgia","Times New Roman",serif; letter-spacing:.5px}
+      /* language pills top-right */
+      .langbar{display:flex; gap:8px; align-items:center}
+      .langpill{
+        font:600 12px/1 "Inter",system-ui,sans-serif;
+        letter-spacing:.5px;
+        padding:8px 10px;
+        border:1px solid var(--line);
+        border-radius:999px;
+        background:#fff;
+        color:var(--ink);
+        cursor:pointer;
+        user-select:none;
+      }
+      .langpill.is-active{background:var(--ink); color:#fff; border-color:var(--ink)}
+      .langpill:hover{transform:translateY(-1px)}
       .hero{display:grid; gap:8px; margin:8px 0 18px}
       .hero h1{margin:0; font:600 38px/1.15 "Georgia","Times New Roman",serif; letter-spacing:.2px}
       .hero p{margin:0; color:var(--muted)}
@@ -56,8 +71,16 @@
   <body>
     <div class="wrap">
       <header>
-        <div class="logo">AV</div>
-        <div class="title">AstroVogue</div>
+        <div class="brand">
+          <div class="logo">AV</div>
+          <div class="title">AstroVogue</div>
+        </div>
+        <nav class="langbar" aria-label="Language">
+          <span class="langpill" data-lang="dk">DK</span>
+          <span class="langpill is-active" data-lang="en">EN</span>
+          <span class="langpill" data-lang="es">ES</span>
+          <span class="langpill" data-lang="tr">TR</span>
+        </nav>
       </header>
 
       <section class="hero">
@@ -74,14 +97,6 @@
               <select id="sun"></select>
               <select id="day"></select>
             </div>
-
-            <div class="label" id="t-lang-label">Language</div>
-            <select id="lang" style="margin-bottom:10px">
-              <option value="en" selected>English</option>
-              <option value="tr">Türkçe</option>
-              <option value="es">Español</option>
-              <option value="dk">Dansk</option>
-            </select>
 
             <button id="go-daily" class="btn btn--brand" style="margin-bottom:10px">Get daily reading</button>
 
@@ -111,13 +126,12 @@
     </div>
 
     <script>
-      // Languages
+      // i18n dictionary
       const i18n = {
         en: {
           headline: "Daily astrology and style",
           tagline: "Choose your sign. Add your rising for a more personal read.",
           sunDayLabel: "Sun sign and day",
-          langLabel: "Language",
           risingLabel: "Rising (optional)",
           btnDaily: "Get daily reading",
           btnPersonal: "Get personal guidance",
@@ -128,13 +142,13 @@
           signs: {
             aries:"Aries", taurus:"Taurus", gemini:"Gemini", cancer:"Cancer", leo:"Leo", virgo:"Virgo",
             libra:"Libra", scorpio:"Scorpio", sagittarius:"Sagittarius", capricorn:"Capricorn", aquarius:"Aquarius", pisces:"Pisces"
-          }
+          },
+          loading: "Loading…", selectSign: "Select a sign"
         },
         tr: {
           headline: "Günlük astroloji ve stil",
           tagline: "Burcunu seç. Yükseleni ekleyerek kişiselleştir.",
           sunDayLabel: "Güneş burcun ve gün",
-          langLabel: "Dil",
           risingLabel: "Yükselen (opsiyonel)",
           btnDaily: "Günlük yorumu getir",
           btnPersonal: "Kişisel rehberi getir",
@@ -145,13 +159,13 @@
           signs: {
             aries:"Koç", taurus:"Boğa", gemini:"İkizler", cancer:"Yengeç", leo:"Aslan", virgo:"Başak",
             libra:"Terazi", scorpio:"Akrep", sagittarius:"Yay", capricorn:"Oğlak", aquarius:"Kova", pisces:"Balık"
-          }
+          },
+          loading: "Yükleniyor…", selectSign: "Burç seç"
         },
         es: {
           headline: "Astrología y estilo diarios",
           tagline: "Elige tu signo. Añade tu ascendente para un toque personal.",
           sunDayLabel: "Signo solar y día",
-          langLabel: "Idioma",
           risingLabel: "Ascendente (opcional)",
           btnDaily: "Leer del día",
           btnPersonal: "Guía personal",
@@ -162,13 +176,13 @@
           signs: {
             aries:"Aries", taurus:"Tauro", gemini:"Géminis", cancer:"Cáncer", leo:"Leo", virgo:"Virgo",
             libra:"Libra", scorpio:"Escorpio", sagittarius:"Sagitario", capricorn:"Capricornio", aquarius:"Acuario", pisces:"Piscis"
-          }
+          },
+          loading: "Cargando…", selectSign: "Elige un signo"
         },
         dk: {
           headline: "Daglig astrologi og stil",
           tagline: "Vælg dit tegn. Tilføj ascendant for et mere personligt læsning.",
           sunDayLabel: "Solsign og dag",
-          langLabel: "Sprog",
           risingLabel: "Ascendant (valgfri)",
           btnDaily: "Hent dagens læsning",
           btnPersonal: "Hent personlig vejledning",
@@ -179,29 +193,33 @@
           signs: {
             aries:"Vædder", taurus:"Tyr", gemini:"Tvilling", cancer:"Krebs", leo:"Løve", virgo:"Jomfru",
             libra:"Vægt", scorpio:"Skorpion", sagittarius:"Skytte", capricorn:"Stenbuk", aquarius:"Vandbærer", pisces:"Fisk"
-          }
+          },
+          loading: "Indlæser…", selectSign: "Vælg et tegn"
         }
       };
 
+      // elements
       const sunSel = document.getElementById("sun");
       const risingSel = document.getElementById("rising");
       const daySel = document.getElementById("day");
-      const langSel = document.getElementById("lang");
       const statusEl = document.getElementById("status");
       const result = document.getElementById("result");
-
-      // UI text nodes
       const elHeadline = document.getElementById("t-headline");
       const elTagline = document.getElementById("t-tagline");
       const elSunDayLabel = document.getElementById("t-sun-day-label");
-      const elLangLabel = document.getElementById("t-lang-label");
       const elRisingLabel = document.getElementById("t-rising-label");
       const btnDaily = document.getElementById("go-daily");
       const btnPersonal = document.getElementById("go-personal");
       const defaultTitle = document.getElementById("t-default-title");
       const defaultHelp = document.getElementById("t-default-help");
+      const langPills = Array.from(document.querySelectorAll(".langpill"));
 
-      // Populate selects based on language
+      let currentLang = "en";
+
+      function setActiveLangPill(lang){
+        langPills.forEach(p => p.classList.toggle("is-active", p.dataset.lang === lang));
+      }
+
       function renderDayOptions(lang) {
         daySel.innerHTML = "";
         i18n[lang].days.forEach(d => {
@@ -212,79 +230,71 @@
       }
       function renderSignOptions(lang) {
         const names = i18n[lang].signs;
-        function fillSelect(selectEl, includeNone) {
+        function fill(selectEl, includeNone) {
           selectEl.innerHTML = "";
           if (includeNone) {
             const none = document.createElement("option");
-            none.value = ""; none.textContent = lang === "en" ? "None" :
-              lang === "tr" ? "Seçim yok" : lang === "es" ? "Ninguno" : "Ingen";
+            none.value = "";
+            none.textContent = lang==="en"?"None":lang==="tr"?"Seçim yok":lang==="es"?"Ninguno":"Ingen";
             selectEl.appendChild(none);
           }
-          Object.entries(names).forEach(([code, label]) => {
-            const opt = document.createElement("option");
-            opt.value = code; opt.textContent = label;
-            selectEl.appendChild(opt);
+          Object.entries(names).forEach(([code,label])=>{
+            const o = document.createElement("option"); o.value = code; o.textContent = label; selectEl.appendChild(o);
           });
         }
-        fillSelect(sunSel, false);
-        fillSelect(risingSel, true);
+        fill(sunSel,false);
+        fill(risingSel,true);
       }
-      function setUIText(lang) {
+      function setUIText(lang){
         const t = i18n[lang];
         elHeadline.textContent = t.headline;
         elTagline.textContent = t.tagline;
         elSunDayLabel.textContent = t.sunDayLabel;
-        elLangLabel.textContent = t.langLabel;
         elRisingLabel.textContent = t.risingLabel;
         btnDaily.textContent = t.btnDaily;
         btnPersonal.textContent = t.btnPersonal;
         defaultTitle.textContent = t.defaultTitle;
         defaultHelp.textContent = t.defaultHelp;
       }
-
-      function initLanguage(lang="en"){
+      function initLanguage(lang){
+        currentLang = lang;
+        setActiveLangPill(lang);
+        const prevSun = sunSel.value;
+        const prevRising = risingSel.value;
         setUIText(lang);
         renderDayOptions(lang);
         renderSignOptions(lang);
-        statusEl.textContent = "";
-      }
-      // init with English default
-      initLanguage("en");
-
-      langSel.addEventListener("change", () => {
-        const lang = langSel.value || "en";
-        const prevSun = sunSel.value;
-        const prevRising = risingSel.value;
-        initLanguage(lang);
-        // try to preserve previous values
         if (prevSun) sunSel.value = prevSun;
         if (prevRising) risingSel.value = prevRising;
+        statusEl.textContent = "";
+      }
+
+      // init default English
+      initLanguage("en");
+
+      langPills.forEach(pill=>{
+        pill.addEventListener("click", ()=>{
+          const lang = pill.dataset.lang;
+          if (lang !== currentLang) initLanguage(lang);
+        });
       });
 
       document.getElementById("go-daily").addEventListener("click", fetchDaily);
       document.getElementById("go-personal").addEventListener("click", fetchPersonal);
 
       function showStatus(t){ statusEl.textContent = t || ""; }
-
-      function displaySignLabel(code){
-        const lang = langSel.value || "en";
-        return i18n[lang].signs[code] || code;
-      }
-      function kvLabel(key){
-        const lang = langSel.value || "en";
-        return i18n[lang].kv[key];
-      }
+      function displaySignLabel(code){ return i18n[currentLang].signs[code] || code; }
+      function kvLabel(key){ return i18n[currentLang].kv[key]; }
 
       async function fetchDaily(){
-        const lang = langSel.value || "en";
         const sign = sunSel.value;
         const day = daySel.value;
-        if (!sign) { showStatus("Select a sign"); return; }
-        showStatus(lang === "tr" ? "Yükleniyor…" : lang === "es" ? "Cargando…" : lang === "dk" ? "Indlæser…" : "Loading…");
+        if (!sign) { showStatus(i18n[currentLang].selectSign); return; }
+        showStatus(i18n[currentLang].loading);
         result.innerHTML = "";
         try{
           const base = window.location.origin;
-          const url = `${base}/api/daily?sign=${encodeURIComponent(sign)}&day=${encodeURIComponent(day)}&lang=${encodeURIComponent(lang)}`;
+          const url = `${base}/api/daily?sign=${encodeURIComponent(sign)}&day=${encodeURIComponent(day)}&lang=${encodeURIComponent(currentLang)}`;
           const r = await fetch(url);
           if(!r.ok) throw new Error("Request failed");
           const d = await r.json();
@@ -295,19 +305,18 @@
       }
 
       async function fetchPersonal(){
-        const lang = langSel.value || "en";
         const sun = sunSel.value;
         const rising = risingSel.value || "";
         const day = daySel.value;
-        if (!sun) { showStatus("Select a sign"); return; }
-        showStatus(lang === "tr" ? "Yükleniyor…" : lang === "es" ? "Cargando…" : lang === "dk" ? "Indlæser…" : "Loading…");
+        if (!sun) { showStatus(i18n[currentLang].selectSign); return; }
+        showStatus(i18n[currentLang].loading);
         result.innerHTML = "";
         try{
           const base = window.location.origin;
           const r = await fetch(`${base}/api/personalized`,{
             method:"POST",
             headers:{ "Content-Type":"application/json" },
-            body: JSON.stringify({ sun, rising, day, lang })
+            body: JSON.stringify({ sun, rising, day, lang: currentLang })
           });
           if(!r.ok) throw new Error("Request failed");
           const d = await r.json();
@@ -318,7 +327,6 @@
       }
 
       function renderDaily(d){
-        const lang = langSel.value || "en";
         const title = `${displaySignLabel(d.sign)} | ${d.date}`;
         const html = `
           <div class="fade-in">
@@ -340,16 +348,14 @@
       }
 
       function renderPersonal(d){
-        const lang = langSel.value || "en";
         const title = `${displaySignLabel(d.sun)}${d.rising ? " ↑ " + displaySignLabel(d.rising) : ""} | ${d.date}`;
-        const focusLabel = kvLabel("focus");
         const html = `
           <div class="fade-in">
             <h3>${title}</h3>
             <p>${d.summary || ""}</p>
 
             <div class="kv">
-              <div class="muted">${focusLabel}</div><div>${d.guidance ? d.guidance.split(".")[0] : "-"}</div>
+              <div class="muted">${kvLabel("focus")}</div><div>${d.guidance ? d.guidance.split(".")[0] : "-"}</div>
               <div class="muted">${kvLabel("mood")}</div><div>${d.mood || "-"}</div>
               <div class="muted">${kvLabel("color")}</div><div><span class="chip">${d.color || "-"}</span></div>
               <div class="muted">${kvLabel("compat")}</div><div>${d.compatibility || "-"}</div>
