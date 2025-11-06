@@ -8,43 +8,54 @@
     <link rel="icon" href="/favicon.svg" />
     <style>
       :root{
-        --bg:#f7f7f7; --panel:#ffffff; --ink:#0f1115; --muted:#6b7280;
-        --line:#e5e7eb; --brand:#111827; --radius:16px;
-        --shadow:0 6px 30px rgba(0,0,0,0.06); --accent:#bfa980;
+        /* Vogue-ish palette */
+        --paper:#faf7f2; --paper2:#ffffff; --ink:#0b0b0b; --muted:#6b6b6b;
+        --line:#e7e2da; --panel:#ffffff; --accent:#bfa980;
+        --radius:16px; --shadow:0 10px 30px rgba(0,0,0,.06);
       }
       *{box-sizing:border-box}
-      body{margin:0; background:var(--bg); color:var(--ink);
-        font:16px/1.6 -apple-system,BlinkMacSystemFont,"Inter","Segoe UI",Roboto,Ubuntu,"Helvetica Neue",Arial,sans-serif}
-      .wrap{max-width:980px; margin:0 auto; padding:28px 16px 60px}
-      header{display:flex; align-items:center; gap:12px; margin-bottom:18px}
-      .logo{width:36px; height:36px; border-radius:10px; background:var(--ink); display:grid; place-items:center; color:#fff; font-weight:600}
-      .title{font-size:20px; font-weight:650; color:var(--brand)}
-      .hero{display:grid; gap:8px; margin:6px 0 14px}
-      .hero h1{margin:0; font-size:30px; line-height:1.2; letter-spacing:-0.3px}
+      body{
+        margin:0; color:var(--ink);
+        background:
+          linear-gradient(180deg,var(--paper),var(--paper2) 25%,var(--paper) 100%);
+        font:16px/1.6 -apple-system,BlinkMacSystemFont,"Inter","Segoe UI",Roboto,Ubuntu,"Helvetica Neue",Arial,sans-serif;
+        letter-spacing:.2px;
+      }
+      .wrap{max-width:1000px; margin:0 auto; padding:32px 16px 64px}
+      header{display:flex; align-items:center; gap:12px; margin-bottom:22px}
+      .logo{width:36px; height:36px; border-radius:10px; background:var(--ink); display:grid; place-items:center; color:#fff; font-weight:700}
+      .title{font:600 18px/1 "Georgia","Times New Roman",serif; letter-spacing:.5px}
+      .hero{display:grid; gap:8px; margin:8px 0 18px}
+      .hero h1{
+        margin:0; font:600 38px/1.15 "Georgia","Times New Roman",serif; letter-spacing:.2px;
+      }
       .hero p{margin:0; color:var(--muted)}
-      /* toolbar */
-      .toolbar{display:grid; gap:10px; margin:14px 0 18px}
-      .bar{display:grid; grid-template-columns:1fr 1fr 1fr auto auto; gap:10px}
-      @media (max-width:800px){ .bar{grid-template-columns:1fr 1fr 1fr; } .bar .btn-wrap{grid-column:1/-1; display:flex; gap:10px} }
+      .grid{display:grid; grid-template-columns:1.1fr 1fr; gap:20px}
+      @media (max-width:900px){ .grid{grid-template-columns:1fr} }
+
+      .panel{background:var(--panel); border-radius:var(--radius); box-shadow:var(--shadow); border:1px solid var(--line)}
+      .card{padding:18px}
+      .label{font-size:13px; color:var(--muted); margin-bottom:6px}
       select,button{appearance:none; border:1px solid var(--line); background:#fff; color:var(--ink);
         border-radius:12px; padding:12px 14px; font:inherit; width:100%}
+      .row{display:grid; grid-template-columns:1fr 1fr; gap:12px}
       .btn{cursor:pointer; transition:transform .06s ease, box-shadow .06s ease}
       .btn:hover{transform:translateY(-1px)}
       .btn--brand{background:var(--ink); color:#fff; border-color:var(--ink)}
       .btn--accent{background:var(--accent); color:#fff; border-color:var(--accent)}
-      /* result card */
-      .panel{background:var(--panel); border-radius:var(--radius); box-shadow:var(--shadow); border:1px solid var(--line)}
-      .result{padding:18px; display:grid; gap:10px}
-      .result h3{margin:0 0 6px 0; font-size:18px}
-      .kv{display:grid; grid-template-columns:140px 1fr; gap:6px; padding-top:6px}
-      .chip{display:inline-block; font-size:12px; color:#111; background:#f1f3f5; border:1px solid var(--line); padding:6px 10px; border-radius:999px; margin-right:6px}
-      .section{padding-top:8px}
-      .section h4{margin:14px 0 6px 0; font-size:14px}
+      .status{font-size:13px; color:var(--muted); padding-top:4px}
+
+      .result{padding:18px; display:grid; gap:12px; min-height:120px}
+      .result h3{
+        margin:0 0 2px 0; font:600 20px/1.2 "Georgia","Times New Roman",serif;
+      }
+      .kv{display:grid; grid-template-columns:140px 1fr; gap:6px; padding-top:4px}
       .muted{color:var(--muted)}
-      .status{font-size:13px; color:var(--muted)}
-      footer{margin-top:22px; color:var(--muted); font-size:13px}
-      .fade-in{animation:fade .25s ease both}
+      .chip{display:inline-block; font-size:12px; color:#111; background:#f5f3ee; border:1px solid var(--line); padding:6px 10px; border-radius:999px}
+      .divider{height:1px; background:var(--line); margin:6px 0 2px}
+      .fade-in{animation:fade .2s ease both}
       @keyframes fade{from{opacity:0; transform:translateY(3px)} to{opacity:1; transform:none}}
+      footer{margin-top:22px; color:var(--muted); font-size:13px}
     </style>
   </head>
   <body>
@@ -59,29 +70,37 @@
         <p>Burcuna göre enerji, renk ve yönlendirme. Yükselenini ekleyerek kişiselleştir.</p>
       </section>
 
-      <!-- Top toolbar: no side column, no empty space -->
-      <section class="toolbar">
-        <div class="bar">
-          <select id="sun"></select>
-          <select id="rising"></select>
-          <select id="day">
-            <option value="today">Bugün</option>
-            <option value="tomorrow">Yarın</option>
-            <option value="yesterday">Dün</option>
-          </select>
-          <div class="btn-wrap">
-            <button id="go-daily" class="btn btn--brand">Günlük yorumu getir</button>
+      <section class="grid">
+        <!-- Controls -->
+        <div class="panel">
+          <div class="card">
+            <div class="label">Güneş burcun ve gün</div>
+            <div class="row" style="margin-bottom:10px">
+              <select id="sun"></select>
+              <select id="day">
+                <option value="today">Bugün</option>
+                <option value="tomorrow">Yarın</option>
+                <option value="yesterday">Dün</option>
+              </select>
+            </div>
+            <button id="go-daily" class="btn btn--brand" style="margin-bottom:10px">Günlük yorumu getir</button>
+
+            <div class="label" style="margin-top:6px">Yükselen (opsiyonel)</div>
+            <div class="row" style="margin-bottom:10px">
+              <select id="rising"></select>
+              <div></div>
+            </div>
             <button id="go-personal" class="btn btn--accent">Kişisel rehberi getir</button>
+            <div id="status" class="status"></div>
           </div>
         </div>
-        <div id="status" class="status"></div>
-      </section>
 
-      <!-- Full-width results -->
-      <section class="panel">
-        <div class="result" id="result">
-          <h3>Bugünün yorumu</h3>
-          <p class="muted">Güneş ve yükseleni seç. Sonra birini tıkla.</p>
+        <!-- Results -->
+        <div class="panel">
+          <div class="result" id="result">
+            <h3>Bugünün yorumu</h3>
+            <p class="muted">Güneş burcunu seç. İstersen yükseleni ekle.</p>
+          </div>
         </div>
       </section>
 
@@ -96,40 +115,37 @@
         ["leo","Aslan"],["virgo","Başak"],["libra","Terazi"],["scorpio","Akrep"],
         ["sagittarius","Yay"],["capricorn","Oğlak"],["aquarius","Kova"],["pisces","Balık"]
       ];
-
       const sunSel = document.getElementById("sun");
       const risingSel = document.getElementById("rising");
       const daySel = document.getElementById("day");
       const statusEl = document.getElementById("status");
       const result = document.getElementById("result");
 
-      // fill selects
-      risingSel.insertAdjacentHTML("afterbegin", '<option value="">Yükselen (opsiyonel)</option>');
+      // populate selects
       for (const [v,t] of SIGNS){
-        const a = document.createElement("option"); a.value=v; a.textContent=t; sunSel.appendChild(a);
-        const b = document.createElement("option"); b.value=v; b.textContent=t; risingSel.appendChild(b);
+        const o1=document.createElement("option"); o1.value=v; o1.textContent=t; sunSel.appendChild(o1);
+        const o2=document.createElement("option"); o2.value=v; o2.textContent=t; risingSel.appendChild(o2);
       }
+      risingSel.insertAdjacentHTML("afterbegin", '<option value="">Seçim yok</option>');
+      risingSel.value = "";
 
       document.getElementById("go-daily").addEventListener("click", fetchDaily);
       document.getElementById("go-personal").addEventListener("click", fetchPersonal);
 
-      function showStatus(text){ statusEl.textContent = text || ""; }
+      function showStatus(t){ statusEl.textContent = t || ""; }
 
       async function fetchDaily(){
         showStatus("Yükleniyor…");
         result.innerHTML = "";
         try{
           const base = window.location.origin;
-          const url = `${base}/api/daily?sign=${encodeURIComponent(sunSel.value)}&day=${encodeURIComponent(daySel.value)}`;
-          const r = await fetch(url);
+          const r = await fetch(`${base}/api/daily?sign=${encodeURIComponent(sunSel.value)}&day=${encodeURIComponent(daySel.value)}`);
           if(!r.ok) throw new Error("İstek hata verdi");
           const d = await r.json();
           renderDaily(d);
-          showStatus("");
         }catch(e){
-          showStatus("");
           result.innerHTML = `<p class="muted">Hata: ${e.message}</p>`;
-        }
+        }finally{ showStatus(""); }
       }
 
       async function fetchPersonal(){
@@ -149,23 +165,33 @@
           if(!r.ok) throw new Error("İstek hata verdi");
           const d = await r.json();
           renderPersonal(d);
-          showStatus("");
         }catch(e){
-          showStatus("");
           result.innerHTML = `<p class="muted">Hata: ${e.message}</p>`;
-        }
+        }finally{ showStatus(""); }
       }
 
-      function section(label, value){
-        if(!value) return "";
-        return `<div class="section"><h4>${label}</h4><p>${value}</p></div>`;
+      function composeParagraph(d){
+        // Build one elegant paragraph from many fields, only adding what exists
+        const bits = [];
+        if (d.analiz) bits.push(d.analiz);
+        if (d.ask) bits.push(`Aşk: ${d.ask}`);
+        if (d.kariyer) bits.push(`Kariyer: ${d.kariyer}`);
+        if (d.para) bits.push(`Para: ${d.para}`);
+        if (d.sosyal) bits.push(`Sosyal: ${d.sosyal}`);
+        if (d.dikkat) bits.push(`Dikkat: ${d.dikkat}`);
+        if (d.zaman_araligi) bits.push(`En iyi zaman: ${d.zaman_araligi}`);
+        if (d.mantra) bits.push(`Mantra: ${d.mantra}`);
+        if (d.moda_onerisi) bits.push(`Stil: ${d.moda_onerisi}`);
+        return bits.join(" ");
       }
 
       function renderDaily(d){
+        const paragraph = composeParagraph(d);
         const html = `
           <div class="fade-in">
             <h3>${d.burc} | ${d.tarih}</h3>
             <p>${d.aciklama}</p>
+
             <div class="kv">
               <div class="muted">Uyum</div><div>${d.uyum || "-"}</div>
               <div class="muted">Ruh hali</div><div>${d.ruh_hali || "-"}</div>
@@ -173,40 +199,29 @@
               <div class="muted">Şanslı sayı</div><div>${d.sansli_sayi || "-"}</div>
               <div class="muted">Şanslı saat</div><div>${d.sansli_saat || "-"}</div>
             </div>
-            ${section("Analiz", d.analiz)}
-            ${section("Aşk", d.ask)}
-            ${section("Kariyer", d.kariyer)}
-            ${section("Para", d.para)}
-            ${section("Sosyal", d.sosyal)}
-            ${section("Dikkat", d.dikkat)}
-            ${section("En iyi zaman", d.zaman_araligi)}
-            ${section("Mantra", d.mantra)}
-            ${section("Ay evresi", d.ay_evresi)}
-            ${section("Stil", d.moda_onerisi)}
+
+            <div class="divider"></div>
+            <p>${paragraph}</p>
           </div>`;
         result.innerHTML = html;
       }
 
       function renderPersonal(d){
+        const paragraph = composeParagraph(d);
         const html = `
           <div class="fade-in">
             <h3>${d.gunes}${d.yukselen ? " ↑ " + d.yukselen : ""} | ${d.tarih}</h3>
             <p>${d.aciklama}</p>
+
             <div class="kv">
               <div class="muted">Odak</div><div>${d.odak || "-"}</div>
               <div class="muted">Ruh hali</div><div>${d.ruh_hali || "-"}</div>
               <div class="muted">Renk</div><div><span class="chip">${d.renk || "-"}</span></div>
               <div class="muted">Uyum</div><div>${d.uyum || "-"}</div>
             </div>
-            ${section("Rehber", d.rehber)}
-            ${section("Stil", d.stil)}
-            ${section("Aşk", d.ask)}
-            ${section("Kariyer", d.kariyer)}
-            ${section("Para", d.para)}
-            ${section("Sosyal", d.sosyal)}
-            ${section("Dikkat", d.dikkat)}
-            ${section("En iyi zaman", d.zaman_araligi)}
-            ${section("Mantra", d.mantra)}
+
+            <div class="divider"></div>
+            <p>${paragraph}</p>
           </div>`;
         result.innerHTML = html;
       }
