@@ -36,9 +36,11 @@
       .btn--accent{background:var(--accent); color:#fff; border-color:var(--accent)}
       .muted{color:var(--muted)}
       .result{padding:16px; display:grid; gap:10px; min-height:120px}
-      .result h3{margin:0 0 4px 0; font-size:18px}
+      .result h3{margin:0 0 6px 0; font-size:18px}
       .kv{display:grid; grid-template-columns:140px 1fr; gap:6px; padding-top:6px}
       .chip{display:inline-block; font-size:12px; color:#111; background:#f1f3f5; border:1px solid var(--line); padding:6px 10px; border-radius:999px; margin-right:6px}
+      .section{padding-top:8px}
+      .section h4{margin:14px 0 6px 0; font-size:14px}
       footer{margin-top:24px; color:var(--muted); font-size:13px}
       .fade-in{animation:fade .25s ease both}
       @keyframes fade{from{opacity:0; transform:translateY(3px)} to{opacity:1; transform:none}}
@@ -164,11 +166,17 @@
         }
       }
 
+      function section(label, value){
+        if(!value) return "";
+        return `<div class="section"><h4>${label}</h4><p>${value}</p></div>`;
+      }
+
       function renderDaily(d){
         const html = `
           <div class="fade-in">
             <h3>${d.burc} — ${d.tarih}</h3>
             <p>${d.aciklama}</p>
+
             <div class="kv">
               <div class="muted">Uyum</div><div>${d.uyum || "-"}</div>
               <div class="muted">Ruh hali</div><div>${d.ruh_hali || "-"}</div>
@@ -176,8 +184,17 @@
               <div class="muted">Şanslı sayı</div><div>${d.sansli_sayi || "-"}</div>
               <div class="muted">Şanslı saat</div><div>${d.sansli_saat || "-"}</div>
             </div>
-            <p><strong>Analiz:</strong> ${d.analiz}</p>
-            <p><strong>Stil:</strong> ${d.moda_onerisi}</p>
+
+            ${section("Analiz", d.analiz)}
+            ${section("Aşk", d.ask)}
+            ${section("Kariyer", d.kariyer)}
+            ${section("Para", d.para)}
+            ${section("Sosyal", d.sosyal)}
+            ${section("Dikkat", d.dikkat)}
+            ${section("En iyi zaman", d.zaman_araligi)}
+            ${section("Mantra", d.mantra)}
+            ${section("Ay evresi", d.ay_evresi)}
+            ${section("Stil", d.moda_onerisi)}
           </div>`;
         result.innerHTML = html;
       }
@@ -187,14 +204,23 @@
           <div class="fade-in">
             <h3>${d.gunes}${d.yukselen ? " ↑ " + d.yukselen : ""} — ${d.tarih}</h3>
             <p>${d.aciklama}</p>
+
             <div class="kv">
               <div class="muted">Odak</div><div>${d.odak || "-"}</div>
               <div class="muted">Ruh hali</div><div>${d.ruh_hali || "-"}</div>
               <div class="muted">Renk</div><div><span class="chip">${d.renk || "-"}</span></div>
               <div class="muted">Uyum</div><div>${d.uyum || "-"}</div>
             </div>
-            <p><strong>Rehber:</strong> ${d.rehber}</p>
-            <p><strong>Stil:</strong> ${d.stil}</p>
+
+            ${section("Rehber", d.rehber)}
+            ${section("Stil", d.stil)}
+            ${section("Aşk", d.ask)}
+            ${section("Kariyer", d.kariyer)}
+            ${section("Para", d.para)}
+            ${section("Sosyal", d.sosyal)}
+            ${section("Dikkat", d.dikkat)}
+            ${section("En iyi zaman", d.zaman_araligi)}
+            ${section("Mantra", d.mantra)}
           </div>`;
         result.innerHTML = html;
       }
