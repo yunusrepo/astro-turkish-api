@@ -29,6 +29,24 @@ const TR_SIGN = {
 
 const cache = {}; // { key: { data, expiresAt } }
 
+// ---------- utils ----------
+function addDays(date, n) {
+  const d = new Date(date.getTime());
+  d.setUTCDate(d.getUTCDate() + n);
+  return d;
+}
+function dayOffset(day) {
+  if (day === "yesterday") return -1;
+  if (day === "tomorrow") return 1;
+  return 0;
+}
+function trDateFor(day) {
+  const base = new Date(); // UTC now
+  const target = addDays(base, dayOffset(day));
+  // Format in Turkey local time
+  return new Intl.DateTimeFormat("tr-TR", { timeZone: "Europe/Istanbul" }).format(target);
+}
+
 async function openaiJSON(system, user) {
   if (!OPENAI_KEY) throw new Error("OPENAI_API_KEY missing");
   const r = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -58,7 +76,7 @@ async function openaiJSON(system, user) {
 function fashionTip(color, mood) {
   const tipsByColor = {
     "Gri": "Sade tonlar ve net kesimler seç.",
-    "Mavi": "Açık mavi veya denim dengeleme sağlar.",
+    "Mavi": "Açık mavi ya da denim dengeleme sağlar.",
     "Kırmızı": "Küçük bir kırmızı aksesuar enerji katar.",
     "Yeşil": "Doğal tonlar iç huzuru yansıtır.",
     "Pembe": "Yumuşak detaylarla sıcaklık ekle.",
@@ -73,7 +91,7 @@ function fashionTip(color, mood) {
   return tipsByColor[color] || tipsByMood[mood] || "Zarif bir aksesuar ekle.";
 }
 
-// ---------- DAILY: OpenAI-only ----------
+// ---------- DAILY: richer sections ----------
 app.get("/api/daily", async (req, res) => {
   try {
     const sign = String(req.query.sign || "").toLowerCase();
@@ -86,8 +104,8 @@ app.get("/api/daily", async (req, res) => {
 
     const system =
       "AstroVogue için kıdemli bir astrologsun. Türkçe yaz. Ton net, sakin, profesyonel. " +
-      "Kısa cümleler. Kaderci söylem yok. Sağlık ve tıbbi iddialar yok. " +
-      "Gerçekçi günlük yönlendirme ver. Sadece istenen alanları döndür.";
+      "Somut öneri ver. Sağlık iddiası yok. Kaderci söylem yok. " +
+      "İstenen alanları JSON olarak döndür.";
 
     const user =
       JSON.stringify({
@@ -97,8 +115,11 @@ app.get("/api/daily", async (req, res) => {
       }) +
       "\n" +
       "Sadece şu JSON anahtarlarını üret: " +
-      "{ aciklama, ruh_hali, renk, uyum, sansli_sayi, sansli_saat, analiz }. " +
-      "Her alan 1 cümle, analiz 1-2 cümle olsun.";
+      "{ aciklama, ruh_hali, renk, uyum, sansli_sayi, sansli_saat, analiz, " +
+      "ask, kariyer, para, sosyal, dikkat, zaman_araligi, mantra, ay_evresi }. " +
+      "Her alan kısa ve net olsun. 'dikkat' alanı yapıcı uyarılar içersin. " +
+      "'zaman_araligi' bir saat aralığı gibi yazılsın (örn: 13:00-16:00). " +
+      "'mantra' 6-10 kelimelik olumlama olsun.";
 
     let j = await openaiJSON(system, user);
     j.renk = j.renk || "Gri";
@@ -108,7 +129,7 @@ app.get("/api/daily", async (req, res) => {
       marka: "AstroVogue",
       burc: TR_SIGN[sign],
       gun: day,
-      tarih: new Date().toLocaleDateString("tr-TR"),
+      tarih: trDateFor(day),
       aciklama: j.aciklama || "",
       uyum: j.uyum || "",
       ruh_hali: j.ruh_hali,
@@ -116,6 +137,14 @@ app.get("/api/daily", async (req, res) => {
       sansli_sayi: j.sansli_sayi || "",
       sansli_saat: j.sansli_saat || "",
       analiz: j.analiz || "",
+      ask: j.ask || "",
+      kariyer: j.kariyer || "",
+      para: j.para || "",
+      sosyal: j.sosyal || "",
+      dikkat: j.dikkat || "",
+      zaman_araligi: j.zaman_araligi || "",
+      mantra: j.mantra || "",
+      ay_evresi: j.ay_evresi || "",
       moda_onerisi: fashionTip(j.renk, j.ruh_hali)
     };
 
@@ -123,24 +152,33 @@ app.get("/api/daily", async (req, res) => {
     res.json(payload);
   } catch (err) {
     console.error(err.message);
+    const d = String(req.query.day || "today").toLowerCase();
     res.json({
       marka: "AstroVogue",
       burc: TR_SIGN[String(req.query.sign||"").toLowerCase()] || "—",
-      gun: req.query.day || "today",
-      tarih: new Date().toLocaleDateString("tr-TR"),
-      aciklama: "Günü basit planla ve iletişimde net ol.",
+      gun: d,
+      tarih: trDateFor(d),
+      aciklama: "Günü sade planla ve iletişimde net ol.",
       uyum: "Yengeç",
       ruh_hali: "Dengeli",
       renk: "Gri",
       sansli_sayi: "4",
       sansli_saat: "14:00",
       analiz: "Odak dağılmasın. Sakin ilerle.",
+      ask: "Duyguları açıkça ifade et.",
+      kariyer: "Öncelik listeni daralt.",
+      para: "Gereksiz harcamaları beklet.",
+      sosyal: "Yakın çevreyle kısa sohbet iyi gelir.",
+      dikkat: "Acele karar verme.",
+      zaman_araligi: "13:00-16:00",
+      mantra: "Sade kalırım, net ilerlerim.",
+      ay_evresi: "Nötr",
       moda_onerisi: "Sade tonlar ve net kesimler seç."
     });
   }
 });
 
-// ---------- PERSONALIZED: sun + rising + pro-astrologer tone ----------
+// ---------- PERSONALIZED: sun + rising with deeper sections ----------
 app.post("/api/personalized", async (req, res) => {
   try {
     const sun = String(req.body.sun || "").toLowerCase();
@@ -152,22 +190,23 @@ app.post("/api/personalized", async (req, res) => {
 
     const system =
       "AstroVogue için kıdemli bir astrologsun. Türkçe yaz. Net, ölçülü, güvenilir ton. " +
-      "Güneş ve yükseleni birlikte düşün. Somut yönlendirme ver. " +
-      "Sağlık iddiası yok. Abartı yok. Sadece istenen alanları döndür.";
+      "Güneş ve yükseleni birlikte yorumla. Somut öneri ver. Sağlık iddiası yok. " +
+      "Sadece istenen alanları JSON döndür.";
 
     const userObj = {
       tur: "kisisel",
       gun: day,
       gunes: TR_SIGN[sun],
       yukselen: rising ? TR_SIGN[rising] : null
-      // ileride: dogum verisi ve harita özetleri eklenecek
+      // ileride: doğum verisi ve harita özetleri eklenecek
     };
     const user =
       JSON.stringify(userObj) +
       "\n" +
       "Sadece şu JSON anahtarlarını üret: " +
-      "{ odak, rehber, stil, aciklama, ruh_hali, renk, uyum }. " +
-      "odak bir kelime ya da kısa ifade. rehber 2-3 cümle. stil 1 cümle.";
+      "{ odak, rehber, stil, aciklama, ruh_hali, renk, uyum, " +
+      "ask, kariyer, para, sosyal, dikkat, zaman_araligi, mantra }. " +
+      "odak kısa olsun. rehber 2-3 cümle. stil 1 cümle.";
 
     let j = await openaiJSON(system, user);
     j.renk = j.renk || "Gri";
@@ -175,7 +214,7 @@ app.post("/api/personalized", async (req, res) => {
 
     res.json({
       marka: "AstroVogue",
-      tarih: new Date().toLocaleDateString("tr-TR"),
+      tarih: trDateFor(day),
       gunes: TR_SIGN[sun],
       yukselen: rising ? TR_SIGN[rising] : null,
       aciklama: j.aciklama || "",
@@ -184,13 +223,21 @@ app.post("/api/personalized", async (req, res) => {
       uyum: j.uyum || "",
       odak: j.odak || "Genel",
       rehber: j.rehber || "Planı sade tut ve net ol.",
-      stil: j.stil || fashionTip(j.renk, j.ruh_hali)
+      stil: j.stil || fashionTip(j.renk, j.ruh_hali),
+      ask: j.ask || "",
+      kariyer: j.kariyer || "",
+      para: j.para || "",
+      sosyal: j.sosyal || "",
+      dikkat: j.dikkat || "",
+      zaman_araligi: j.zaman_araligi || "",
+      mantra: j.mantra || ""
     });
   } catch (err) {
     console.error(err.message);
+    const d = String(req.body.day || "today").toLowerCase();
     res.json({
       marka: "AstroVogue",
-      tarih: new Date().toLocaleDateString("tr-TR"),
+      tarih: trDateFor(d),
       gunes: TR_SIGN[String(req.body.sun||"").toLowerCase()] || "—",
       yukselen: req.body.rising ? TR_SIGN[String(req.body.rising).toLowerCase()] : null,
       aciklama: "Bugün sade hedeflerle ilerle.",
@@ -199,7 +246,14 @@ app.post("/api/personalized", async (req, res) => {
       uyum: "Yengeç",
       odak: "Genel",
       rehber: "Net plan yap, küçük adımlar at.",
-      stil: "Minimal bir siluet ve tek güçlü aksesuar."
+      stil: "Minimal bir siluet ve tek güçlü aksesuar.",
+      ask: "Duyguları açıkça ifade et.",
+      kariyer: "Öncelik listeni daralt.",
+      para: "Gereksiz harcamaları beklet.",
+      sosyal: "Yakın çevreyle kısa sohbet iyi gelir.",
+      dikkat: "Acele karar verme.",
+      zaman_araligi: "13:00-16:00",
+      mantra: "Sade kalırım, net ilerlerim."
     });
   }
 });
