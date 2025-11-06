@@ -21,29 +21,24 @@ const SIGNS = [
   "libra","scorpio","sagittarius","capricorn","aquarius","pisces"
 ];
 const DAY_VALUES = ["today","tomorrow","yesterday"];
+const LANGS = ["en","tr","es","dk"];
 const TR_SIGN = {
   aries: "Koç", taurus: "Boğa", gemini: "İkizler", cancer: "Yengeç",
   leo: "Aslan", virgo: "Başak", libra: "Terazi", scorpio: "Akrep",
   sagittarius: "Yay", capricorn: "Oğlak", aquarius: "Kova", pisces: "Balık"
 };
 
-const cache = {}; // { key: { data, expiresAt } }
+const cache = {};
 
-// ---------- utils ----------
-function addDays(date, n) {
-  const d = new Date(date.getTime());
-  d.setUTCDate(d.getUTCDate() + n);
-  return d;
-}
+function addDays(date, n) { const d = new Date(date); d.setUTCDate(d.getUTCDate() + n); return d; }
 function dayOffset(day) {
   if (day === "yesterday") return -1;
   if (day === "tomorrow") return 1;
   return 0;
 }
 function trDateFor(day) {
-  const base = new Date(); // UTC now
+  const base = new Date();
   const target = addDays(base, dayOffset(day));
-  // Format in Turkey local time
   return new Intl.DateTimeFormat("tr-TR", { timeZone: "Europe/Istanbul" }).format(target);
 }
 
@@ -65,204 +60,120 @@ async function openaiJSON(system, user) {
       ]
     })
   });
-  if (!r.ok) {
-    const t = await r.text();
-    throw new Error(`OpenAI ${r.status}: ${t.slice(0,160)}`);
-  }
   const data = await r.json();
   return JSON.parse(data.choices[0].message.content);
 }
 
-function fashionTip(color, mood) {
-  const tipsByColor = {
-    "Gri": "Sade tonlar ve net kesimler seç.",
-    "Mavi": "Açık mavi ya da denim dengeleme sağlar.",
-    "Kırmızı": "Küçük bir kırmızı aksesuar enerji katar.",
-    "Yeşil": "Doğal tonlar iç huzuru yansıtır.",
-    "Pembe": "Yumuşak detaylarla sıcaklık ekle.",
-    "Siyah": "Minimal ve güçlü bir siluet uygula."
+// --- Utility: choose base text per language ---
+function systemPrompt(lang, type="daily") {
+  const tone = "Professional astrologer voice, concise, elegant, trustworthy.";
+  const tones = {
+    en: `${tone} Write in natural English.`,
+    tr: `AstroVogue için kıdemli astrologsun. Türkçe yaz. Ton net, sakin, profesyonel.`,
+    es: `Eres un astrólogo profesional para AstroVogue. Escribe en español, tono elegante y confiable.`,
+    dk: `Du er en professionel astrolog for AstroVogue. Skriv på dansk, kort og tillidsvækkende tone.`
   };
-  const tipsByMood = {
-    "Dengeli": "Zarif ve yalın kal.",
-    "Enerjik": "Spor-şık parçaları karıştır.",
-    "Romantik": "Pastel dokulara yönel.",
-    "Sakin": "Nötr ve rahat kesimler kullan."
-  };
-  return tipsByColor[color] || tipsByMood[mood] || "Zarif bir aksesuar ekle.";
+  return tones[lang] || tones["en"];
 }
 
-// ---------- DAILY: richer sections ----------
+function fashionTip(color, mood) {
+  const tipsByColor = {
+    Gray: "Choose minimalist, structured tones.",
+    Grey: "Choose minimalist, structured tones.",
+    "Gri": "Sade tonlar ve net kesimler seç.",
+    "Azul": "Elige tonos azules o denim para equilibrio.",
+    "Blå": "Vælg blå nuancer for ro.",
+    "Rojo": "Un toque rojo aporta energía.",
+    "Rød": "Et rødt tilbehør giver energi."
+  };
+  return tipsByColor[color] || "Keep it elegant and balanced.";
+}
+
+// --- DAILY ---
 app.get("/api/daily", async (req, res) => {
   try {
     const sign = String(req.query.sign || "").toLowerCase();
     const day = String(req.query.day || "today").toLowerCase();
-    if (!SIGNS.includes(sign)) return res.status(400).json({ error: "Geçersiz burç." });
-    if (!DAY_VALUES.includes(day)) return res.status(400).json({ error: "Geçersiz gün." });
+    const lang = String(req.query.lang || "en").toLowerCase();
+    if (!SIGNS.includes(sign)) return res.status(400).json({ error: "Invalid sign." });
+    if (!DAY_VALUES.includes(day)) return res.status(400).json({ error: "Invalid day." });
+    if (!LANGS.includes(lang)) return res.status(400).json({ error: "Invalid lang." });
 
-    const cacheKey = `daily:${sign}:${day}`;
+    const cacheKey = `daily:${sign}:${day}:${lang}`;
     if (cache[cacheKey]?.expiresAt > Date.now()) return res.json(cache[cacheKey].data);
 
-    const system =
-      "AstroVogue için kıdemli bir astrologsun. Türkçe yaz. Ton net, sakin, profesyonel. " +
-      "Somut öneri ver. Sağlık iddiası yok. Kaderci söylem yok. " +
-      "İstenen alanları JSON olarak döndür.";
-
+    const system = systemPrompt(lang, "daily");
     const user =
-      JSON.stringify({
-        tur: "gunluk",
-        gun: day,
-        gunes: TR_SIGN[sign]
-      }) +
-      "\n" +
-      "Sadece şu JSON anahtarlarını üret: " +
-      "{ aciklama, ruh_hali, renk, uyum, sansli_sayi, sansli_saat, analiz, " +
-      "ask, kariyer, para, sosyal, dikkat, zaman_araligi, mantra, ay_evresi }. " +
-      "Her alan kısa ve net olsun. 'dikkat' alanı yapıcı uyarılar içersin. " +
-      "'zaman_araligi' bir saat aralığı gibi yazılsın (örn: 13:00-16:00). " +
-      "'mantra' 6-10 kelimelik olumlama olsun.";
+      JSON.stringify({ sign, day, lang }) +
+      "\nReturn JSON with { description, mood, color, compatibility, lucky_number, lucky_time, paragraph }.";
 
     let j = await openaiJSON(system, user);
-    j.renk = j.renk || "Gri";
-    j.ruh_hali = j.ruh_hali || "Dengeli";
 
     const payload = {
-      marka: "AstroVogue",
-      burc: TR_SIGN[sign],
-      gun: day,
-      tarih: trDateFor(day),
-      aciklama: j.aciklama || "",
-      uyum: j.uyum || "",
-      ruh_hali: j.ruh_hali,
-      renk: j.renk,
-      sansli_sayi: j.sansli_sayi || "",
-      sansli_saat: j.sansli_saat || "",
-      analiz: j.analiz || "",
-      ask: j.ask || "",
-      kariyer: j.kariyer || "",
-      para: j.para || "",
-      sosyal: j.sosyal || "",
-      dikkat: j.dikkat || "",
-      zaman_araligi: j.zaman_araligi || "",
-      mantra: j.mantra || "",
-      ay_evresi: j.ay_evresi || "",
-      moda_onerisi: fashionTip(j.renk, j.ruh_hali)
+      brand: "AstroVogue",
+      sign,
+      lang,
+      date: trDateFor(day),
+      description: j.description || "",
+      mood: j.mood || "",
+      color: j.color || "",
+      compatibility: j.compatibility || "",
+      lucky_number: j.lucky_number || "",
+      lucky_time: j.lucky_time || "",
+      paragraph: j.paragraph || "",
+      fashion_tip: fashionTip(j.color, j.mood)
     };
 
     cache[cacheKey] = { data: payload, expiresAt: Date.now() + 30 * 60 * 1000 };
     res.json(payload);
   } catch (err) {
     console.error(err.message);
-    const d = String(req.query.day || "today").toLowerCase();
-    res.json({
-      marka: "AstroVogue",
-      burc: TR_SIGN[String(req.query.sign||"").toLowerCase()] || "—",
-      gun: d,
-      tarih: trDateFor(d),
-      aciklama: "Günü sade planla ve iletişimde net ol.",
-      uyum: "Yengeç",
-      ruh_hali: "Dengeli",
-      renk: "Gri",
-      sansli_sayi: "4",
-      sansli_saat: "14:00",
-      analiz: "Odak dağılmasın. Sakin ilerle.",
-      ask: "Duyguları açıkça ifade et.",
-      kariyer: "Öncelik listeni daralt.",
-      para: "Gereksiz harcamaları beklet.",
-      sosyal: "Yakın çevreyle kısa sohbet iyi gelir.",
-      dikkat: "Acele karar verme.",
-      zaman_araligi: "13:00-16:00",
-      mantra: "Sade kalırım, net ilerlerim.",
-      ay_evresi: "Nötr",
-      moda_onerisi: "Sade tonlar ve net kesimler seç."
-    });
+    res.json({ error: "Server error" });
   }
 });
 
-// ---------- PERSONALIZED: sun + rising with deeper sections ----------
+// --- PERSONALIZED ---
 app.post("/api/personalized", async (req, res) => {
   try {
     const sun = String(req.body.sun || "").toLowerCase();
     const rising = String(req.body.rising || "").toLowerCase();
     const day = String(req.body.day || "today").toLowerCase();
-    if (!SIGNS.includes(sun)) return res.status(400).json({ error: "Geçersiz güneş burcu." });
-    if (rising && !SIGNS.includes(rising)) return res.status(400).json({ error: "Geçersiz yükselen burç." });
-    if (!DAY_VALUES.includes(day)) return res.status(400).json({ error: "Geçersiz gün." });
+    const lang = String(req.body.lang || "en").toLowerCase();
+    if (!SIGNS.includes(sun)) return res.status(400).json({ error: "Invalid sun." });
+    if (rising && !SIGNS.includes(rising)) return res.status(400).json({ error: "Invalid rising." });
 
-    const system =
-      "AstroVogue için kıdemli bir astrologsun. Türkçe yaz. Net, ölçülü, güvenilir ton. " +
-      "Güneş ve yükseleni birlikte yorumla. Somut öneri ver. Sağlık iddiası yok. " +
-      "Sadece istenen alanları JSON döndür.";
-
-    const userObj = {
-      tur: "kisisel",
-      gun: day,
-      gunes: TR_SIGN[sun],
-      yukselen: rising ? TR_SIGN[rising] : null
-      // ileride: doğum verisi ve harita özetleri eklenecek
-    };
+    const system = systemPrompt(lang, "personalized");
     const user =
-      JSON.stringify(userObj) +
-      "\n" +
-      "Sadece şu JSON anahtarlarını üret: " +
-      "{ odak, rehber, stil, aciklama, ruh_hali, renk, uyum, " +
-      "ask, kariyer, para, sosyal, dikkat, zaman_araligi, mantra }. " +
-      "odak kısa olsun. rehber 2-3 cümle. stil 1 cümle.";
+      JSON.stringify({ sun, rising, day, lang }) +
+      "\nReturn JSON with { summary, guidance, color, mood, compatibility, paragraph }.";
 
     let j = await openaiJSON(system, user);
-    j.renk = j.renk || "Gri";
-    j.ruh_hali = j.ruh_hali || "Dengeli";
+    const payload = {
+      brand: "AstroVogue",
+      lang,
+      date: trDateFor(day),
+      sun,
+      rising,
+      summary: j.summary || "",
+      guidance: j.guidance || "",
+      color: j.color || "",
+      mood: j.mood || "",
+      compatibility: j.compatibility || "",
+      paragraph: j.paragraph || "",
+      fashion_tip: fashionTip(j.color, j.mood)
+    };
 
-    res.json({
-      marka: "AstroVogue",
-      tarih: trDateFor(day),
-      gunes: TR_SIGN[sun],
-      yukselen: rising ? TR_SIGN[rising] : null,
-      aciklama: j.aciklama || "",
-      ruh_hali: j.ruh_hali,
-      renk: j.renk,
-      uyum: j.uyum || "",
-      odak: j.odak || "Genel",
-      rehber: j.rehber || "Planı sade tut ve net ol.",
-      stil: j.stil || fashionTip(j.renk, j.ruh_hali),
-      ask: j.ask || "",
-      kariyer: j.kariyer || "",
-      para: j.para || "",
-      sosyal: j.sosyal || "",
-      dikkat: j.dikkat || "",
-      zaman_araligi: j.zaman_araligi || "",
-      mantra: j.mantra || ""
-    });
+    res.json(payload);
   } catch (err) {
     console.error(err.message);
-    const d = String(req.body.day || "today").toLowerCase();
-    res.json({
-      marka: "AstroVogue",
-      tarih: trDateFor(d),
-      gunes: TR_SIGN[String(req.body.sun||"").toLowerCase()] || "—",
-      yukselen: req.body.rising ? TR_SIGN[String(req.body.rising).toLowerCase()] : null,
-      aciklama: "Bugün sade hedeflerle ilerle.",
-      ruh_hali: "Dengeli",
-      renk: "Gri",
-      uyum: "Yengeç",
-      odak: "Genel",
-      rehber: "Net plan yap, küçük adımlar at.",
-      stil: "Minimal bir siluet ve tek güçlü aksesuar.",
-      ask: "Duyguları açıkça ifade et.",
-      kariyer: "Öncelik listeni daralt.",
-      para: "Gereksiz harcamaları beklet.",
-      sosyal: "Yakın çevreyle kısa sohbet iyi gelir.",
-      dikkat: "Acele karar verme.",
-      zaman_araligi: "13:00-16:00",
-      mantra: "Sade kalırım, net ilerlerim."
-    });
+    res.json({ error: "Server error" });
   }
 });
 
-// root
 app.get("/", (_req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 app.listen(PORT, () => {
-  console.log(`Server on http://localhost:${PORT}`);
+  console.log(`Server running on http://localhost:${PORT}`);
 });
