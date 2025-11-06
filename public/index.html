@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Astro Turkish API</title>
+    <meta name="description" content="Günlük burç yorumu API'si ve sade arayüz." />
+    <link rel="icon" href="/favicon.svg" />
+    <style>
+      :root{
+        --bg:#f7f7f7;
+        --panel:#ffffff;
+        --ink:#0f1115;
+        --muted:#6b7280;
+        --line:#e5e7eb;
+        --brand:#111827;
+        --radius:16px;
+        --shadow:0 6px 30px rgba(0,0,0,0.06);
+      }
+      *{box-sizing:border-box}
+      html,body{height:100%}
+      body{
+        margin:0; background:var(--bg); color:var(--ink);
+        font:16px/1.6 -apple-system,BlinkMacSystemFont,"Inter","Segoe UI",Roboto,Ubuntu,"Helvetica Neue",Arial,"Apple Color Emoji","Segoe UI Emoji",sans-serif;
+        letter-spacing:0.2px;
+      }
+      a{color:inherit}
+      .wrap{max-width:1000px; margin:0 auto; padding:40px 20px 80px}
+      header{display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:40px}
+      .brand{display:flex; align-items:center; gap:12px; text-decoration:none}
+      .logo{width:36px; height:36px; border-radius:10px; background:var(--ink); display:grid; place-items:center; color:#fff; font-weight:600; letter-spacing:0.5px}
+      .title{font-size:20px; font-weight:650; color:var(--brand)}
+      .hero{display:grid; gap:14px; margin:20px 0 28px}
+      .hero h1{margin:0; font-size:40px; line-height:1.15; letter-spacing:-0.5px}
+      .hero p{margin:0; color:var(--muted); max-width:58ch}
+      .panel{background:var(--panel); border-radius:var(--radius); box-shadow:var(--shadow); border:1px solid var(--line)}
+      .grid{display:grid; grid-template-columns:1.2fr 1fr; gap:18px}
+      @media (max-width:900px){ .grid{grid-template-columns:1fr} }
+      .card{padding:20px 20px}
+      .card + .card{border-top:1px solid var(--line)}
+      .label{font-size:13px; color:var(--muted); margin-bottom:8px}
+      select,button{appearance:none; border:1px solid var(--line); background:#fff; color:var(--ink); border-radius:12px; padding:12px 14px; font:inherit; width:100%}
+      .row{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+      .btn{cursor:pointer; transition:transform .06s ease, box-shadow .06s ease}
+      .btn:hover{transform:translateY(-1px)}
+      .btn:active{transform:translateY(0)}
+      .btn--brand{background:var(--ink); color:#fff; border-color:var(--ink); box-shadow:0 8px 20px rgba(15,17,21,0.12)}
+      .muted{color:var(--muted)}
+      .result{padding:20px; display:grid; gap:10px}
+      .result h3{margin:0 0 4px 0; font-size:18px}
+      .kv{display:grid; grid-template-columns:140px 1fr; gap:6px; padding-top:6px}
+      .chip{display:inline-block; font-size:12px; color:#111; background:#f1f3f5; border:1px solid var(--line); padding:6px 10px; border-radius:999px; margin-right:6px}
+      footer{margin-top:28px; color:var(--muted); font-size:13px}
+      .fade-in{animation:fade .25s ease both}
+      @keyframes fade{from{opacity:0; transform:translateY(3px)} to{opacity:1; transform:none}}
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <a class="brand" href="/">
+          <div class="logo">AR</div>
+          <div class="title">Astro Reader</div>
+        </a>
+      </header>
+
+      <section class="hero">
+        <h1>Sade, şık, güvenilir astro içerik</h1>
+        <p>Günlük burç yorumları ve kişisel analizler. API’niz hazır. Tasarım Nordik sade. Reklam ve üyelik için ideal.</p>
+      </section>
+
+      <section class="grid">
+        <div class="panel">
+          <div class="card">
+            <div class="label">Burç ve gün</div>
+            <div class="row" style="margin-bottom:12px">
+              <select id="sign">
+                <option value="aries">Koç</option>
+                <option value="taurus">Boğa</option>
+                <option value="gemini">İkizler</option>
+                <option value="cancer">Yengeç</option>
+                <option value="leo">Aslan</option>
+                <option value="virgo">Başak</option>
+                <option value="libra">Terazi</option>
+                <option value="scorpio">Akrep</option>
+                <option value="sagittarius">Yay</option>
+                <option value="capricorn">Oğlak</option>
+                <option value="aquarius">Kova</option>
+                <option value="pisces">Balık</option>
+              </select>
+              <select id="day">
+                <option value="today">Bugün</option>
+                <option value="tomorrow">Yarın</option>
+                <option value="yesterday">Dün</option>
+              </select>
+            </div>
+            <button id="go" class="btn btn--brand">Analizi getir</button>
+          </div>
+          <div class="card">
+            <div id="status" class="muted">Hazır.</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="result" id="result">
+            <h3>Sonuç burada görünecek</h3>
+            <p class="muted">Burcunuzu seçip “Analizi getir”e tıklayın.</p>
+          </div>
+        </div>
+      </section>
+
+      <footer>
+        <p>© Astro Reader. Bu arayüz, kendi Render servisinizdeki <code>/api/daily</code> uç noktasına bağlanır.</p>
+      </footer>
+    </div>
+
+    <script>
+      const go = document.getElementById("go");
+      const result = document.getElementById("result");
+      const statusEl = document.getElementById("status");
+      const sign = document.getElementById("sign");
+      const day = document.getElementById("day");
+
+      async function fetchDaily(){
+        const base = window.location.origin;
+        const url = `${base}/api/daily?sign=${encodeURIComponent(sign.value)}&day=${encodeURIComponent(day.value)}`;
+        statusEl.textContent = "Yükleniyor…";
+        result.innerHTML = "";
+        try{
+          const r = await fetch(url);
+          if(!r.ok) throw new Error("İstek hata verdi");
+          const d = await r.json();
+          const html = `
+            <div class="fade-in">
+              <h3>${d.burc} — ${d.tarih}</h3>
+              <p>${d.aciklama}</p>
+              <div class="kv">
+                <div class="muted">Uyum</div><div>${d.uyum || "-"}</div>
+                <div class="muted">Ruh hali</div><div>${d.ruh_hali || "-"}</div>
+                <div class="muted">Renk</div><div><span class="chip">${d.renk || "-"}</span></div>
+                <div class="muted">Şanslı sayı</div><div>${d.sansli_sayi || "-"}</div>
+                <div class="muted">Şanslı saat</div><div>${d.sansli_saat || "-"}</div>
+              </div>
+              <p><strong>Analiz:</strong> ${d.analiz}</p>
+            </div>`;
+          result.innerHTML = html;
+          statusEl.textContent = "Hazır.";
+        }catch(err){
+          statusEl.textContent = "Bir sorun oluştu.";
+          result.innerHTML = `<p class="muted">Hata: ${err.message}</p>`;
+        }
+      }
+      go.addEventListener("click", fetchDaily);
+    </script>
+  </body>
+</html>
