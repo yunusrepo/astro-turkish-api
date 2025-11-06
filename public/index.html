@@ -3,18 +3,13 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Astro Turkish API</title>
-    <meta name="description" content="Günlük burç yorumu API'si ve sade arayüz." />
+    <title>Astro Reader</title>
+    <meta name="description" content="Günlük burç yorumları ve kısa analizler." />
     <link rel="icon" href="/favicon.svg" />
     <style>
       :root{
-        --bg:#f7f7f7;
-        --panel:#ffffff;
-        --ink:#0f1115;
-        --muted:#6b7280;
-        --line:#e5e7eb;
-        --brand:#111827;
-        --radius:16px;
+        --bg:#f7f7f7; --panel:#ffffff; --ink:#0f1115; --muted:#6b7280;
+        --line:#e5e7eb; --brand:#111827; --radius:16px;
         --shadow:0 6px 30px rgba(0,0,0,0.06);
       }
       *{box-sizing:border-box}
@@ -24,49 +19,45 @@
         font:16px/1.6 -apple-system,BlinkMacSystemFont,"Inter","Segoe UI",Roboto,Ubuntu,"Helvetica Neue",Arial,"Apple Color Emoji","Segoe UI Emoji",sans-serif;
         letter-spacing:0.2px;
       }
-      a{color:inherit}
       .wrap{max-width:1000px; margin:0 auto; padding:40px 20px 80px}
-      header{display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:40px}
-      .brand{display:flex; align-items:center; gap:12px; text-decoration:none}
-      .logo{width:36px; height:36px; border-radius:10px; background:var(--ink); display:grid; place-items:center; color:#fff; font-weight:600; letter-spacing:0.5px}
+      header{display:flex; align-items:center; gap:12px; margin-bottom:40px}
+      .logo{width:36px; height:36px; border-radius:10px; background:var(--ink); display:grid; place-items:center; color:#fff; font-weight:600}
       .title{font-size:20px; font-weight:650; color:var(--brand)}
       .hero{display:grid; gap:14px; margin:20px 0 28px}
       .hero h1{margin:0; font-size:40px; line-height:1.15; letter-spacing:-0.5px}
       .hero p{margin:0; color:var(--muted); max-width:58ch}
-      .panel{background:var(--panel); border-radius:var(--radius); box-shadow:var(--shadow); border:1px solid var(--line)}
       .grid{display:grid; grid-template-columns:1.2fr 1fr; gap:18px}
       @media (max-width:900px){ .grid{grid-template-columns:1fr} }
-      .card{padding:20px 20px}
+      .panel{background:var(--panel); border-radius:var(--radius); box-shadow:var(--shadow); border:1px solid var(--line)}
+      .card{padding:20px}
       .card + .card{border-top:1px solid var(--line)}
       .label{font-size:13px; color:var(--muted); margin-bottom:8px}
       select,button{appearance:none; border:1px solid var(--line); background:#fff; color:var(--ink); border-radius:12px; padding:12px 14px; font:inherit; width:100%}
       .row{display:grid; grid-template-columns:1fr 1fr; gap:12px}
       .btn{cursor:pointer; transition:transform .06s ease, box-shadow .06s ease}
       .btn:hover{transform:translateY(-1px)}
-      .btn:active{transform:translateY(0)}
       .btn--brand{background:var(--ink); color:#fff; border-color:var(--ink); box-shadow:0 8px 20px rgba(15,17,21,0.12)}
       .muted{color:var(--muted)}
-      .result{padding:20px; display:grid; gap:10px}
+      .result{padding:20px; display:grid; gap:10px; min-height:120px}
       .result h3{margin:0 0 4px 0; font-size:18px}
       .kv{display:grid; grid-template-columns:140px 1fr; gap:6px; padding-top:6px}
       .chip{display:inline-block; font-size:12px; color:#111; background:#f1f3f5; border:1px solid var(--line); padding:6px 10px; border-radius:999px; margin-right:6px}
       footer{margin-top:28px; color:var(--muted); font-size:13px}
       .fade-in{animation:fade .25s ease both}
       @keyframes fade{from{opacity:0; transform:translateY(3px)} to{opacity:1; transform:none}}
+      a.brand{display:flex; align-items:center; gap:12px; text-decoration:none; color:inherit}
     </style>
   </head>
   <body>
     <div class="wrap">
       <header>
-        <a class="brand" href="/">
-          <div class="logo">AR</div>
-          <div class="title">Astro Reader</div>
-        </a>
+        <div class="logo">AR</div>
+        <div class="title">Astro Reader</div>
       </header>
 
       <section class="hero">
-        <h1>Sade, şık, güvenilir astro içerik</h1>
-        <p>Günlük burç yorumları ve kişisel analizler. API’niz hazır. Tasarım Nordik sade. Reklam ve üyelik için ideal.</p>
+        <h1>Günlük burç yorumun burada</h1>
+        <p>Sade ve şık tasarımda günlük yorumlar, renkli ipuçları ve mini analizler. Burcunu seç, hemen gör.</p>
       </section>
 
       <section class="grid">
@@ -103,14 +94,14 @@
 
         <div class="panel">
           <div class="result" id="result">
-            <h3>Sonuç burada görünecek</h3>
-            <p class="muted">Burcunuzu seçip “Analizi getir”e tıklayın.</p>
+            <h3>Bugünün yorumu</h3>
+            <p class="muted">Burcunuzu seçin, Analizi getir’e dokunun.</p>
           </div>
         </div>
       </section>
 
       <footer>
-        <p>© Astro Reader. Bu arayüz, kendi Render servisinizdeki <code>/api/daily</code> uç noktasına bağlanır.</p>
+        <p>© Astro Reader. Her gün yenilenen yorumlar.</p>
       </footer>
     </div>
 
