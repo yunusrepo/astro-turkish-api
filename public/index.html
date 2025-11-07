@@ -78,6 +78,13 @@
         background:linear-gradient(135deg,var(--accent2),#1f1b2e)}
       .mini-line{font-size:13px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
       .mini-cta{font-size:13px; color:#1f1b2e; font-weight:600; cursor:pointer}
+      .weekly{margin:20px 0; padding:20px; border:1px solid var(--line); border-radius:16px; background:#fff}
+      .weekly h2{font:600 22px/1.2 "Georgia","Times New Roman",serif; margin:0 0 14px 0}
+      .weekly-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:14px}
+      @media (max-width:780px){ .weekly-grid{grid-template-columns:1fr} }
+      .weekly-card{padding:14px; border:1px solid var(--line); border-radius:12px; background:var(--paper)}
+      .weekly-card h3{margin:0 0 6px 0; font-size:16px; font-weight:600}
+      .weekly-card p{margin:0; font-size:14px; color:var(--muted)}
       .signup{margin:26px 0}
       .signup .box{padding:16px; border:1px solid var(--line); background:#fff; border-radius:16px; display:grid; gap:12px}
       .signup input[type="email"]{width:100%; padding:12px 14px; border:1px solid var(--line); border-radius:10px}
@@ -137,7 +144,7 @@
         <div class="panel">
           <div class="result" id="featured">
             <h3 id="t.featured.title">Featured sign</h3>
-            <p class="muted" id="t.featured.help">Today’s highlight will appear here after sample content loads.</p>
+            <p class="muted" id="t.featured.help">Today's highlight will appear here after sample content loads.</p>
           </div>
         </div>
       </section>
@@ -158,9 +165,17 @@
         </div>
       </section>
 
+      <!-- WEEKLY FORECAST -->
+      <section class="weekly" id="weekly">
+        <h2 id="t.weekly.title">This Week's Cosmic Highlights</h2>
+        <div id="weekly-content">
+          <p class="muted" id="t.weekly.loading">Loading weekly forecast...</p>
+        </div>
+      </section>
+
       <!-- SAMPLE GRID -->
       <section class="signs">
-        <h2 id="t.grid.title">Today’s Cosmic Style for Every Sign</h2>
+        <h2 id="t.grid.title">Today's Cosmic Style for Every Sign</h2>
         <div class="cards" id="sample-cards"></div>
       </section>
 
@@ -202,14 +217,16 @@
           "controls.btnDaily": "Get daily reading",
           "controls.btnPersonal": "Get personal guidance",
           "featured.title": "Featured sign",
-          "featured.help": "Today’s highlight will appear here after sample content loads.",
+          "featured.help": "Today's highlight will appear here after sample content loads.",
           "how.h1": "1. Pick your sign",
           "how.p1": "Or add your rising for a sharper read.",
           "how.h2": "2. Read and act",
           "how.p2": "Get mood, color and outfit vibes that fit the day.",
           "how.h3": "3. Go deeper",
           "how.p3": "Unlock weekly alerts and chart reports with Premium.",
-          "grid.title": "Today’s Cosmic Style for Every Sign",
+          "grid.title": "Today's Cosmic Style for Every Sign",
+          "weekly.title": "This Week's Cosmic Highlights",
+          "weekly.loading": "Loading weekly forecast...",
           "email.title": "Get daily cosmic style tips",
           "email.copy": "Short, elegant emails with your color, vibe and ritual. Free to join.",
           "email.btn": "Subscribe",
@@ -219,7 +236,15 @@
           readMore: "Read more",
           days: [{v:"today",t:"Today"},{v:"tomorrow",t:"Tomorrow"},{v:"yesterday",t:"Yesterday"}],
           signs: { aries:"Aries", taurus:"Taurus", gemini:"Gemini", cancer:"Cancer", leo:"Leo", virgo:"Virgo", libra:"Libra", scorpio:"Scorpio", sagittarius:"Sagittarius", capricorn:"Capricorn", aquarius:"Aquarius", pisces:"Pisces" },
-          kv: { compat: "Compatibility", mood: "Mood", color: "Color", luckyNum: "Lucky number", luckyTime: "Lucky time", focus: "Focus" }
+          kv: { 
+            compat: "Compatibility", mood: "Mood", color: "Color", 
+            luckyNum: "Lucky number", luckyTime: "Lucky time", focus: "Focus",
+            food: "Food", cocktail: "Cocktail", clothing: "Clothing",
+            jewelry: "Jewelry", makeup: "Makeup",
+            luckiest: "Luckiest Sign", wealthiest: "Wealthiest Sign", 
+            successful: "Most Successful", fashionTrend: "Fashion Trend", 
+            makeupTrend: "Makeup Trend"
+          }
         },
         tr: {
           "hero.head": "Günlük Kozmik Stil Rehberin",
@@ -239,6 +264,8 @@
           "how.h3": "3. Derinleş",
           "how.p3": "Premium ile haftalık uyarılar ve raporlar açılır.",
           "grid.title": "Bugün: Tüm burçlar için kozmik stil",
+          "weekly.title": "Bu Haftanın Kozmik Öne Çıkanları",
+          "weekly.loading": "Haftalık tahmin yükleniyor...",
           "email.title": "Günlük kozmik stil ipuçları",
           "email.copy": "Renk, ruh ve ritüel özeti. Ücretsiz abonelik.",
           "email.btn": "Abone ol",
@@ -248,7 +275,15 @@
           readMore: "Devamını oku",
           days: [{v:"today",t:"Bugün"},{v:"tomorrow",t:"Yarın"},{v:"yesterday",t:"Dün"}],
           signs: { aries:"Koç", taurus:"Boğa", gemini:"İkizler", cancer:"Yengeç", leo:"Aslan", virgo:"Başak", libra:"Terazi", scorpio:"Akrep", sagittarius:"Yay", capricorn:"Oğlak", aquarius:"Kova", pisces:"Balık" },
-          kv: { compat:"Uyum", mood:"Ruh hali", color:"Renk", luckyNum:"Şanslı sayı", luckyTime:"Şanslı saat", focus:"Odak" }
+          kv: { 
+            compat:"Uyum", mood:"Ruh hali", color:"Renk", 
+            luckyNum:"Şanslı sayı", luckyTime:"Şanslı saat", focus:"Odak",
+            food: "Yemek", cocktail: "İçecek", clothing: "Giysi",
+            jewelry: "Takı", makeup: "Makyaj",
+            luckiest: "En Şanslı", wealthiest: "En Zengin", 
+            successful: "En Başarılı", fashionTrend: "Moda Trendi", 
+            makeupTrend: "Makyaj Trendi"
+          }
         },
         es: {
           "hero.head": "Tu guía cósmica de estilo diaria",
@@ -268,6 +303,8 @@
           "how.h3": "3. Profundiza",
           "how.p3": "Alertas semanales y reportes con Premium.",
           "grid.title": "Estilo cósmico de hoy para cada signo",
+          "weekly.title": "Destacados Cósmicos de esta Semana",
+          "weekly.loading": "Cargando pronóstico semanal...",
           "email.title": "Recibe consejos cósmicos diarios",
           "email.copy": "Correos breves con tu color, vibra y ritual. Gratis.",
           "email.btn": "Suscribirme",
@@ -277,7 +314,15 @@
           readMore: "Leer más",
           days: [{v:"today",t:"Hoy"},{v:"tomorrow",t:"Mañana"},{v:"yesterday",t:"Ayer"}],
           signs: { aries:"Aries", taurus:"Tauro", gemini:"Géminis", cancer:"Cáncer", leo:"Leo", virgo:"Virgo", libra:"Libra", scorpio:"Escorpio", sagittarius:"Sagitario", capricorn:"Capricornio", aquarius:"Acuario", pisces:"Piscis" },
-          kv: { compat:"Compatibilidad", mood:"Estado de ánimo", color:"Color", luckyNum:"Número de la suerte", luckyTime:"Hora de la suerte", focus:"Enfoque" }
+          kv: { 
+            compat:"Compatibilidad", mood:"Estado de ánimo", color:"Color", 
+            luckyNum:"Número de la suerte", luckyTime:"Hora de la suerte", focus:"Enfoque",
+            food: "Comida", cocktail: "Cóctel", clothing: "Ropa",
+            jewelry: "Joyería", makeup: "Maquillaje",
+            luckiest: "Más Afortunado", wealthiest: "Más Próspero", 
+            successful: "Más Exitoso", fashionTrend: "Tendencia Moda", 
+            makeupTrend: "Tendencia Makeup"
+          }
         },
         dk: {
           "hero.head": "Din daglige kosmiske stilguide",
@@ -297,6 +342,8 @@
           "how.h3": "3. Gå dybere",
           "how.p3": "Ugentlige alerts og rapporter med Premium.",
           "grid.title": "Dagens kosmiske stil for alle tegn",
+          "weekly.title": "Ugens Kosmiske Højdepunkter",
+          "weekly.loading": "Indlæser ugentlig prognose...",
           "email.title": "Få daglige kosmiske stil-tips",
           "email.copy": "Korte, elegante mails med farve, vibe og ritual. Gratis.",
           "email.btn": "Tilmeld",
@@ -306,7 +353,15 @@
           readMore: "Læs mere",
           days: [{v:"today",t:"I dag"},{v:"tomorrow",t:"I morgen"},{v:"yesterday",t:"I går"}],
           signs: { aries:"Vædder", taurus:"Tyr", gemini:"Tvilling", cancer:"Krebs", leo:"Løve", virgo:"Jomfru", libra:"Vægt", scorpio:"Skorpion", sagittarius:"Skytte", capricorn:"Stenbuk", aquarius:"Vandbærer", pisces:"Fisk" },
-          kv: { compat:"Kompatibilitet", mood:"Humør", color:"Farve", luckyNum:"Lykketallet", luckyTime:"Lykketid", focus:"Fokus" }
+          kv: { 
+            compat:"Kompatibilitet", mood:"Humør", color:"Farve", 
+            luckyNum:"Lykketallet", luckyTime:"Lykketid", focus:"Fokus",
+            food: "Mad", cocktail: "Cocktail", clothing: "Tøj",
+            jewelry: "Smykker", makeup: "Makeup",
+            luckiest: "Heldigste", wealthiest: "Rigeste", 
+            successful: "Mest Succesfuld", fashionTrend: "Modetrend", 
+            makeupTrend: "Makeup Trend"
+          }
         }
       };
 
@@ -324,13 +379,13 @@
       const statusEl = $("#status");
       const featured = $("#featured");
       const sampleCards = $("#sample-cards");
+      const weeklyContent = $("#weekly-content");
       const emailForm = $("#emailForm"), emailInput = $("#email"), emailStatus = $("#emailStatus");
 
       // i18n apply
       function t(key){ return I18N[lang][key] || key; }
       function setText(id, key){ const el = document.getElementById(id); if(el) el.textContent = t(key); }
       function setUI(){
-        // all labeled nodes
         setText("t.hero.head","hero.head");
         setText("t.hero.tag","hero.tag");
         setText("t.hero.cta1","hero.cta1");
@@ -345,6 +400,8 @@
         setText("t.how.h2","how.h2"); setText("t.how.p2","how.p2");
         setText("t.how.h3","how.h3"); setText("t.how.p3","how.p3");
         setText("t.grid.title","grid.title");
+        setText("t.weekly.title","weekly.title");
+        setText("t.weekly.loading","weekly.loading");
         setText("t.email.title","email.title");
         setText("t.email.copy","email.copy");
         setText("t.email.btn","email.btn");
@@ -383,8 +440,8 @@
         setUI();
         renderDayOptions();
         renderSignOptions();
-        // refresh sample grid in current language
         loadSamples();
+        loadWeekly();
       }
 
       // init
@@ -439,6 +496,16 @@
               <div class="muted">${kvLabel("luckyNum")}</div><div>${d.lucky_number||"-"}</div>
               <div class="muted">${kvLabel("luckyTime")}</div><div>${d.lucky_time||"-"}</div>
             </div>
+            ${d.food||d.cocktail||d.clothing_item||d.jewelry_item||d.makeup_suggestion ? `
+              <div class="divider"></div>
+              <div class="kv">
+                ${d.food ? `<div class="muted">${kvLabel("food")}</div><div>${d.food}</div>` : ''}
+                ${d.cocktail ? `<div class="muted">${kvLabel("cocktail")}</div><div>${d.cocktail}</div>` : ''}
+                ${d.clothing_item ? `<div class="muted">${kvLabel("clothing")}</div><div>${d.clothing_item}</div>` : ''}
+                ${d.jewelry_item ? `<div class="muted">${kvLabel("jewelry")}</div><div>${d.jewelry_item}</div>` : ''}
+                ${d.makeup_suggestion ? `<div class="muted">${kvLabel("makeup")}</div><div>${d.makeup_suggestion}</div>` : ''}
+              </div>
+            ` : ''}
             <div class="divider"></div>
             <p>${[d.paragraph,d.fashion_tip].filter(Boolean).join(" ")}</p>
           </div>`;
@@ -456,8 +523,56 @@
               <div class="muted">${kvLabel("color")}</div><div><span class="chip">${d.color||"-"}</span></div>
               <div class="muted">${kvLabel("compat")}</div><div>${d.compatibility||"-"}</div>
             </div>
+            ${d.food||d.cocktail||d.clothing_item||d.jewelry_item||d.makeup_suggestion ? `
+              <div class="divider"></div>
+              <div class="kv">
+                ${d.food ? `<div class="muted">${kvLabel("food")}</div><div>${d.food}</div>` : ''}
+                ${d.cocktail ? `<div class="muted">${kvLabel("cocktail")}</div><div>${d.cocktail}</div>` : ''}
+                ${d.clothing_item ? `<div class="muted">${kvLabel("clothing")}</div><div>${d.clothing_item}</div>` : ''}
+                ${d.jewelry_item ? `<div class="muted">${kvLabel("jewelry")}</div><div>${d.jewelry_item}</div>` : ''}
+                ${d.makeup_suggestion ? `<div class="muted">${kvLabel("makeup")}</div><div>${d.makeup_suggestion}</div>` : ''}
+              </div>
+            ` : ''}
             <div class="divider"></div>
             <p>${[d.paragraph,d.fashion_tip].filter(Boolean).join(" ")}</p>
+          </div>`;
+      }
+
+      // Weekly forecast
+      async function loadWeekly(){
+        try{
+          const base = window.location.origin;
+          const r = await fetch(`${base}/api/weekly?lang=${lang}`);
+          const d = await r.json();
+          renderWeekly(d);
+        }catch(e){
+          console.error("Weekly load error:", e);
+        }
+      }
+
+      function renderWeekly(d){
+        weeklyContent.innerHTML = `
+          <div class="weekly-grid fade-in">
+            <div class="weekly-card">
+              <h3>🍀 ${kvLabel("luckiest")}: ${signLabel(d.luckiest_sign.toLowerCase())}</h3>
+              <p>${d.luckiest_description||""}</p>
+            </div>
+            <div class="weekly-card">
+              <h3>💰 ${kvLabel("wealthiest")}: ${signLabel(d.wealthiest_sign.toLowerCase())}</h3>
+              <p>${d.wealthiest_description||""}</p>
+            </div>
+            <div class="weekly-card">
+              <h3>⭐ ${kvLabel("successful")}: ${signLabel(d.most_successful_sign.toLowerCase())}</h3>
+              <p>${d.successful_description||""}</p>
+            </div>
+            <div class="weekly-card">
+              <h3>👗 ${kvLabel("fashionTrend")}: ${d.fashion_trend||""}</h3>
+              <p>${d.fashion_description||""}</p>
+            </div>
+            <div class="weekly-card">
+              <h3>💄 ${kvLabel("makeupTrend")}: ${d.makeup_trend||""}</h3>
+              <p>${d.makeup_description||""}</p>
+            </div>
           </div>`;
       }
 
@@ -505,13 +620,14 @@
             method:"POST", headers:{ "Content-Type":"application/json" },
             body: JSON.stringify({ email: emailInput.value, lang })
           });
-          if(r.ok){ emailStatus.textContent = lang==="tr"?"Teşekkürler. Listedesin.":lang==="es"?"Gracias. Ya estás en la lista.":lang==="dk"?"Tak. Du er på listen.":"Thanks. You’re on the list."; emailInput.value=""; }
+          if(r.ok){ emailStatus.textContent = lang==="tr"?"Teşekkürler. Listedesin.":lang==="es"?"Gracias. Ya estás en la lista.":lang==="dk"?"Tak. Du er på listen.":"Thanks. You're on the list."; emailInput.value=""; }
           else{ emailStatus.textContent = lang==="tr"?"Şu an abone olunamadı.":lang==="es"?"No se pudo suscribir.":lang==="dk"?"Kunne ikke tilmelde.":"Could not subscribe."; }
         }catch(_){ emailStatus.textContent = lang==="tr"?"Şu an abone olunamadı.":lang==="es"?"No se pudo suscribir.":lang==="dk"?"Kunne ikke tilmelde.":"Could not subscribe."; }
       });
 
-      // initial samples
+      // initial load
       loadSamples();
+      loadWeekly();
     </script>
   </body>
 </html>
