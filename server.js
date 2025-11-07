@@ -37,6 +37,14 @@ function dateFor(lang, day){
   return new Intl.DateTimeFormat(locales[lang] || "en-GB", { timeZone: tz }).format(target);
 }
 
+// Get current week identifier for weekly cache
+function getWeekKey(){
+  const now = new Date();
+  const year = now.getFullYear();
+  const week = Math.ceil((((now - new Date(year, 0, 1)) / 86400000) + new Date(year, 0, 1).getDay() + 1) / 7);
+  return `${year}-W${week}`;
+}
+
 function systemPrompt(lang){
   const tones = {
     en: "You are a professional astrologer for AstroVogue. Write ONLY in English. Do not mix languages. Concise, elegant, trustworthy. No medical, legal, or financial claims.",
@@ -72,6 +80,9 @@ async function openaiJSON(system, user){
   const data = await r.json();
   return JSON.parse(data.choices[0].message.content);
 }
+
+// Capitalize first letter helper
+function capitalize(str){ return str ? str.charAt(0).toUpperCase() + str.slice(1) : ""; }
 
 // localized fashion tips with no fallback sentence
 function fashionTip(color, mood, lang){
@@ -168,7 +179,7 @@ app.get("/api/daily", async (req, res) => {
     const system = systemPrompt(lang);
     const user =
       JSON.stringify({ sign, day, lang }) +
-      "\nReturn strict JSON with keys: { description, mood, color, compatibility, lucky_number, lucky_time, paragraph }. Do not add extra keys.";
+      "\nReturn strict JSON with keys: { description, mood, color, compatibility, lucky_number, lucky_time, paragraph, food, cocktail, clothing_item, jewelry_item, makeup_suggestion }. Keep it concise and stylish. IMPORTANT: All text should be in the specified language. Do not add extra keys.";
 
     const j = await openaiJSON(system, user);
 
@@ -178,13 +189,18 @@ app.get("/api/daily", async (req, res) => {
       lang,
       date: dateFor(lang, day),
       description: j.description || "",
-      mood: j.mood || "",
-      color: j.color || "",
+      mood: capitalize(j.mood || ""),
+      color: capitalize(j.color || ""),
       compatibility: j.compatibility || "",
       lucky_number: j.lucky_number || "",
       lucky_time: j.lucky_time || "",
       paragraph: j.paragraph || "",
-      fashion_tip: fashionTip(j.color, j.mood, lang)
+      fashion_tip: fashionTip(capitalize(j.color), capitalize(j.mood), lang),
+      food: capitalize(j.food || ""),
+      cocktail: capitalize(j.cocktail || ""),
+      clothing_item: capitalize(j.clothing_item || ""),
+      jewelry_item: capitalize(j.jewelry_item || ""),
+      makeup_suggestion: capitalize(j.makeup_suggestion || "")
     };
 
     cache[cacheKey] = { data: payload, expiresAt: Date.now() + 20 * 60 * 1000 };
@@ -210,7 +226,7 @@ app.post("/api/personalized", async (req, res) => {
     const system = systemPrompt(lang);
     const user =
       JSON.stringify({ sun, rising, day, lang }) +
-      "\nReturn strict JSON with keys: { summary, guidance, color, mood, compatibility, paragraph }. Do not add extra keys.";
+      "\nReturn strict JSON with keys: { summary, guidance, color, mood, compatibility, paragraph, food, cocktail, clothing_item, jewelry_item, makeup_suggestion }. Do not add extra keys.";
 
     const j = await openaiJSON(system, user);
 
@@ -222,13 +238,61 @@ app.post("/api/personalized", async (req, res) => {
       rising,
       summary: j.summary || "",
       guidance: j.guidance || "",
-      color: j.color || "",
-      mood: j.mood || "",
+      color: capitalize(j.color || ""),
+      mood: capitalize(j.mood || ""),
       compatibility: j.compatibility || "",
       paragraph: j.paragraph || "",
-      fashion_tip: fashionTip(j.color, j.mood, lang)
+      fashion_tip: fashionTip(capitalize(j.color), capitalize(j.mood), lang),
+      food: capitalize(j.food || ""),
+      cocktail: capitalize(j.cocktail || ""),
+      clothing_item: capitalize(j.clothing_item || ""),
+      jewelry_item: capitalize(j.jewelry_item || ""),
+      makeup_suggestion: capitalize(j.makeup_suggestion || "")
     };
 
+    res.json(payload);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// NEW: Weekly forecast endpoint
+app.get("/api/weekly", async (req, res) => {
+  try {
+    const lang = String(req.query.lang || "en").toLowerCase();
+    if(!LANGS.includes(lang)) return res.status(400).json({ error: "Invalid lang" });
+
+    const cacheKey = `weekly:${lang}:${getWeekKey()}`;
+    if(cache[cacheKey]?.expiresAt > Date.now()){
+      return res.json(cache[cacheKey].data);
+    }
+
+    const system = systemPrompt(lang);
+    const user =
+      JSON.stringify({ lang, week: getWeekKey() }) +
+      "\nReturn strict JSON with keys: { luckiest_sign, wealthiest_sign, most_successful_sign, fashion_trend, makeup_trend, luckiest_description, wealthiest_description, successful_description, fashion_description, makeup_description }. Each description should be 1-2 sentences. Be specific and stylish. Do not add extra keys.";
+
+    const j = await openaiJSON(system, user);
+
+    const payload = {
+      brand: "AstroVogue",
+      lang,
+      week: getWeekKey(),
+      luckiest_sign: capitalize(j.luckiest_sign || ""),
+      wealthiest_sign: capitalize(j.wealthiest_sign || ""),
+      most_successful_sign: capitalize(j.most_successful_sign || ""),
+      fashion_trend: capitalize(j.fashion_trend || ""),
+      makeup_trend: capitalize(j.makeup_trend || ""),
+      luckiest_description: j.luckiest_description || "",
+      wealthiest_description: j.wealthiest_description || "",
+      successful_description: j.successful_description || "",
+      fashion_description: j.fashion_description || "",
+      makeup_description: j.makeup_description || ""
+    };
+
+    // Cache for 6 hours (weekly content changes less frequently)
+    cache[cacheKey] = { data: payload, expiresAt: Date.now() + 6 * 60 * 60 * 1000 };
     res.json(payload);
   } catch (err) {
     console.error(err);
