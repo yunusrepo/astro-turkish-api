@@ -257,7 +257,7 @@ app.post("/api/personalized", async (req, res) => {
   }
 });
 
-// NEW: Weekly forecast endpoint
+// Weekly forecast endpoint
 app.get("/api/weekly", async (req, res) => {
   try {
     const lang = String(req.query.lang || "en").toLowerCase();
@@ -297,21 +297,6 @@ app.get("/api/weekly", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });
-  }
-});
-
-// simple email capture stub
-app.post("/api/subscribe", async (req, res) => {
-  try {
-    const { email, lang } = req.body || {};
-    const ok = typeof email === "string" && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email);
-    if(!ok) return res.status(400).json({ error: "Invalid email" });
-    console.log("New subscriber:", email, "lang:", lang || "en");
-    // store to DB or ESP here
-    return res.json({ ok: true });
-  } catch (e) {
-    console.error(e);
-    return res.status(500).json({ error: "Server error" });
   }
 });
 
