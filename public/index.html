@@ -75,8 +75,11 @@
       @media (max-width:480px){ .cards{grid-template-columns:1fr} }
       .card-mini{border:1px solid var(--line); border-radius:14px; padding:14px; background:#fff; display:grid; gap:6px}
       .badge{display:inline-flex; align-items:center; gap:6px; font-weight:600}
-      .badge .icon{width:28px; height:28px; border-radius:999px; display:grid; place-items:center; color:#fff;
-        background:linear-gradient(135deg,var(--accent2),#1f1b2e)}
+      .badge .icon{
+        width:28px; height:28px; border-radius:999px; display:grid; place-items:center; color:#fff;
+        background:linear-gradient(135deg,var(--accent2),#1f1b2e);
+        font-size:11px; font-weight:600; letter-spacing:.5px; text-transform:uppercase;
+      }
       .mini-line{
         font-size:13px;
         color:var(--muted);
@@ -222,9 +225,7 @@
       <footer>
         <span>© AstroVogue</span>
         <span>
-          <a class="clean" href="#" title="Instagram">Instagram</a> ·
-          <a class="clean" href="#" title="X">X</a> ·
-          <a class="clean" href="#" title="Contact" id="t.footer.contact">Contact</a>
+          <a class="clean" href="mailto:yunus.ergemen@outlook.com" id="t.footer.contact">Contact</a>
         </span>
       </footer>
     </div>
@@ -254,14 +255,14 @@
           "weekly.title": "This Week's Cosmic Highlights",
           "weekly.loading": "Loading weekly forecast...",
           "footer.contact": "Contact",
-          "affiliate.header": "✨ Shop Your Cosmic Style",
+          "affiliate.header": "Shop Your Cosmic Style",
           "affiliate.fashion": "Fashion",
           "affiliate.fashionDesc": "Discover {color} outfits for {sign}",
           "affiliate.beauty": "Beauty",
           "affiliate.beautyDesc": "{color} makeup & beauty",
           "affiliate.jewelry": "Jewelry",
           "affiliate.jewelryDesc": "{sign} zodiac accessories",
-          "affiliate.cta": "Explore →",
+          "affiliate.cta": "Explore",
           "affiliate.disclaimer": "We may earn a commission from purchases made through these links.",
           loading: "Loading…",
           selectSign: "Select a sign",
@@ -300,14 +301,14 @@
           "weekly.title": "Bu Haftanın Kozmik Öne Çıkanları",
           "weekly.loading": "Haftalık tahmin yükleniyor...",
           "footer.contact": "İletişim",
-          "affiliate.header": "✨ Kozmik Stilini Satın Al",
+          "affiliate.header": "Kozmik Stilini Satın Al",
           "affiliate.fashion": "Moda",
           "affiliate.fashionDesc": "{sign} için {color} kıyafetler",
           "affiliate.beauty": "Güzellik",
           "affiliate.beautyDesc": "{color} makyaj & güzellik",
           "affiliate.jewelry": "Takı",
           "affiliate.jewelryDesc": "{sign} burç aksesuarları",
-          "affiliate.cta": "Keşfet →",
+          "affiliate.cta": "Keşfet",
           "affiliate.disclaimer": "Bu linklerden yapılan alışverişlerden komisyon alabiliriz.",
           loading: "Yükleniyor…",
           selectSign: "Burç seç",
@@ -346,14 +347,14 @@
           "weekly.title": "Destacados Cósmicos de esta Semana",
           "weekly.loading": "Cargando pronóstico semanal...",
           "footer.contact": "Contacto",
-          "affiliate.header": "✨ Compra tu Estilo Cósmico",
+          "affiliate.header": "Compra tu Estilo Cósmico",
           "affiliate.fashion": "Moda",
           "affiliate.fashionDesc": "Outfits {color} para {sign}",
           "affiliate.beauty": "Belleza",
           "affiliate.beautyDesc": "Maquillaje {color}",
           "affiliate.jewelry": "Joyería",
           "affiliate.jewelryDesc": "Accesorios zodiacales {sign}",
-          "affiliate.cta": "Explorar →",
+          "affiliate.cta": "Explorar",
           "affiliate.disclaimer": "Podemos ganar una comisión por compras realizadas a través de estos enlaces.",
           loading: "Cargando…",
           selectSign: "Elige un signo",
@@ -392,14 +393,14 @@
           "weekly.title": "Ugens Kosmiske Højdepunkter",
           "weekly.loading": "Indlæser ugentlig prognose...",
           "footer.contact": "Kontakt",
-          "affiliate.header": "✨ Shop Din Kosmiske Stil",
+          "affiliate.header": "Shop Din Kosmiske Stil",
           "affiliate.fashion": "Mode",
           "affiliate.fashionDesc": "{color} outfits til {sign}",
           "affiliate.beauty": "Beauty",
           "affiliate.beautyDesc": "{color} makeup & beauty",
           "affiliate.jewelry": "Smykker",
           "affiliate.jewelryDesc": "{sign} stjernetegn accessories",
-          "affiliate.cta": "Udforsk →",
+          "affiliate.cta": "Udforsk",
           "affiliate.disclaimer": "Vi kan modtage kommission fra køb gennem disse links.",
           loading: "Indlæser…",
           selectSign: "Vælg et tegn",
@@ -517,12 +518,9 @@
       function generateAffiliateLinks(sign, color){
         const signName = signLabel(sign);
         
-        // Clean color for URL (remove spaces, lowercase)
         const colorClean = (color || "").toLowerCase().replace(/\s+/g, '+');
         const signClean = sign.toLowerCase();
         
-        // You will replace these with your actual affiliate links later
-        // For now, these are generic search URLs
         const links = {
           fashion: {
             en: `https://www.zalando.dk/search?q=${signClean}+${colorClean}+outfit`,
@@ -560,19 +558,19 @@
             <div class="affiliate-header">${t('affiliate.header')}</div>
             <div class="affiliate-grid">
               <a href="${links.fashion}" target="_blank" rel="noopener noreferrer nofollow" class="affiliate-card">
-                <div class="affiliate-card-title">👗 ${t('affiliate.fashion')}</div>
+                <div class="affiliate-card-title">${t('affiliate.fashion')}</div>
                 <div class="affiliate-card-desc">${t('affiliate.fashionDesc').replace('{color}', color).replace('{sign}', signName)}</div>
                 <div class="affiliate-card-cta">${t('affiliate.cta')}</div>
               </a>
               
               <a href="${links.beauty}" target="_blank" rel="noopener noreferrer nofollow" class="affiliate-card">
-                <div class="affiliate-card-title">💄 ${t('affiliate.beauty')}</div>
+                <div class="affiliate-card-title">${t('affiliate.beauty')}</div>
                 <div class="affiliate-card-desc">${t('affiliate.beautyDesc').replace('{color}', color).replace('{sign}', signName)}</div>
                 <div class="affiliate-card-cta">${t('affiliate.cta')}</div>
               </a>
               
               <a href="${links.jewelry}" target="_blank" rel="noopener noreferrer nofollow" class="affiliate-card">
-                <div class="affiliate-card-title">✨ ${t('affiliate.jewelry')}</div>
+                <div class="affiliate-card-title">${t('affiliate.jewelry')}</div>
                 <div class="affiliate-card-desc">${t('affiliate.jewelryDesc').replace('{color}', color).replace('{sign}', signName)}</div>
                 <div class="affiliate-card-cta">${t('affiliate.cta')}</div>
               </a>
@@ -682,23 +680,23 @@
         weeklyContent.innerHTML = `
           <div class="weekly-grid fade-in">
             <div class="weekly-card">
-              <h3>🍀 ${kvLabel("luckiest")}: ${signLabel(d.luckiest_sign.toLowerCase())}</h3>
+              <h3>${kvLabel("luckiest")}: ${signLabel(d.luckiest_sign.toLowerCase())}</h3>
               <p>${d.luckiest_description||""}</p>
             </div>
             <div class="weekly-card">
-              <h3>💰 ${kvLabel("wealthiest")}: ${signLabel(d.wealthiest_sign.toLowerCase())}</h3>
+              <h3>${kvLabel("wealthiest")}: ${signLabel(d.wealthiest_sign.toLowerCase())}</h3>
               <p>${d.wealthiest_description||""}</p>
             </div>
             <div class="weekly-card">
-              <h3>⭐ ${kvLabel("successful")}: ${signLabel(d.most_successful_sign.toLowerCase())}</h3>
+              <h3>${kvLabel("successful")}: ${signLabel(d.most_successful_sign.toLowerCase())}</h3>
               <p>${d.successful_description||""}</p>
             </div>
             <div class="weekly-card">
-              <h3>👗 ${kvLabel("fashionTrend")}: ${d.fashion_trend||""}</h3>
+              <h3>${kvLabel("fashionTrend")}: ${d.fashion_trend||""}</h3>
               <p>${d.fashion_description||""}</p>
             </div>
             <div class="weekly-card">
-              <h3>💄 ${kvLabel("makeupTrend")}: ${d.makeup_trend||""}</h3>
+              <h3>${kvLabel("makeupTrend")}: ${d.makeup_trend||""}</h3>
               <p>${d.makeup_description||""}</p>
             </div>
           </div>`;
@@ -741,8 +739,21 @@
       }
 
       function signIcon(code){
-        const map = { aries:"♈", taurus:"♉", gemini:"♊", cancer:"♋", leo:"♌", virgo:"♍", libra:"♎", scorpio:"♏", sagittarius:"♐", capricorn:"♑", aquarius:"♒", pisces:"♓" };
-        return map[code] || "★";
+        const map = {
+          aries:"Ar",
+          taurus:"Ta",
+          gemini:"Ge",
+          cancer:"Ca",
+          leo:"Le",
+          virgo:"Vi",
+          libra:"Li",
+          scorpio:"Sc",
+          sagittarius:"Sa",
+          capricorn:"Cp",
+          aquarius:"Aq",
+          pisces:"Pi"
+        };
+        return map[code] || "•";
       }
 
       // initial load
