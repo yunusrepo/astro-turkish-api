@@ -85,10 +85,46 @@
       .weekly-card{padding:14px; border:1px solid var(--line); border-radius:12px; background:var(--paper)}
       .weekly-card h3{margin:0 0 6px 0; font-size:16px; font-weight:600}
       .weekly-card p{margin:0; font-size:14px; color:var(--muted)}
-      .signup{margin:26px 0}
-      .signup .box{padding:16px; border:1px solid var(--line); background:#fff; border-radius:16px; display:grid; gap:12px}
-      .signup input[type="email"]{width:100%; padding:12px 14px; border:1px solid var(--line); border-radius:10px}
-      .btn--accent{background:var(--accent); color:#fff; border:1px solid var(--accent)}
+      
+      /* Affiliate Links Section */
+      .affiliate-section{
+        margin-top:16px; padding:16px; border-radius:12px; 
+        background:linear-gradient(135deg, #f8f6f3 0%, #ffffff 100%);
+        border:1px solid var(--line);
+      }
+      .affiliate-header{
+        font-size:14px; font-weight:600; color:var(--ink); 
+        margin-bottom:12px; display:flex; align-items:center; gap:6px;
+      }
+      .affiliate-grid{
+        display:grid; grid-template-columns:repeat(3,1fr); gap:10px;
+      }
+      @media (max-width:780px){ .affiliate-grid{grid-template-columns:1fr} }
+      .affiliate-card{
+        padding:12px; border-radius:10px; background:#fff; 
+        border:1px solid var(--line); display:flex; flex-direction:column; gap:6px;
+        transition:all .15s ease; cursor:pointer; text-decoration:none; color:inherit;
+      }
+      .affiliate-card:hover{
+        transform:translateY(-2px); box-shadow:0 4px 12px rgba(0,0,0,.08);
+        border-color:var(--accent);
+      }
+      .affiliate-card-title{
+        font-size:13px; font-weight:600; color:var(--ink);
+        display:flex; align-items:center; gap:6px;
+      }
+      .affiliate-card-desc{
+        font-size:12px; color:var(--muted); line-height:1.4;
+      }
+      .affiliate-card-cta{
+        font-size:12px; color:var(--accent2); font-weight:600;
+        margin-top:4px; display:flex; align-items:center; gap:4px;
+      }
+      .affiliate-disclaimer{
+        font-size:11px; color:var(--muted); margin-top:10px; 
+        padding-top:10px; border-top:1px solid var(--line);
+      }
+      
       footer{margin-top:26px; color:var(--muted); font-size:13px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px}
       a.clean{color:inherit; text-decoration:none; border-bottom:1px solid #ddd}
     </style>
@@ -112,10 +148,9 @@
       <section class="hero" id="hero">
         <div class="stars"></div>
         <h1 id="t.hero.head">Your Daily Cosmic Style Guide</h1>
-        <p id="t.hero.tag">Personalized fashion and beauty insights from your birth chart. Elegant, accurate, and updated every day.</p>
+        <p id="t.hero.tag">Personalized fashion and beauty insights from your birth chart. Discover your style and shop curated pieces.</p>
         <div class="cta-row">
           <button class="btn btn--brand" id="t.hero.cta1">Get My Cosmic Style Reading</button>
-          <button class="btn btn--ghost" id="t.hero.cta2">Get daily tips by email</button>
         </div>
       </section>
 
@@ -160,8 +195,8 @@
           <p class="muted" id="t.how.p2">Get mood, color and outfit vibes that fit the day.</p>
         </div>
         <div class="step">
-          <strong id="t.how.h3">3. Go deeper</strong>
-          <p class="muted" id="t.how.p3">Unlock weekly alerts and chart reports with Premium.</p>
+          <strong id="t.how.h3">3. Shop your vibe</strong>
+          <p class="muted" id="t.how.p3">Discover curated pieces that match your cosmic style.</p>
         </div>
       </section>
 
@@ -179,21 +214,6 @@
         <div class="cards" id="sample-cards"></div>
       </section>
 
-      <!-- EMAIL SIGNUP -->
-      <section class="signup" id="signup">
-        <div class="box">
-          <strong id="t.email.title">Get daily cosmic style tips</strong>
-          <p class="muted" id="t.email.copy">Short, elegant emails with your color, vibe and ritual. Free to join.</p>
-          <form id="emailForm">
-            <div class="row" style="grid-template-columns:2fr 1fr">
-              <input type="email" id="email" placeholder="you@example.com" required />
-              <button class="btn btn--accent" type="submit" id="t.email.btn">Subscribe</button>
-            </div>
-            <div id="emailStatus" class="status"></div>
-          </form>
-        </div>
-      </section>
-
       <footer>
         <span>© AstroVogue</span>
         <span>
@@ -209,9 +229,8 @@
       const I18N = {
         en: {
           "hero.head": "Your Daily Cosmic Style Guide",
-          "hero.tag": "Personalized fashion and beauty insights from your birth chart. Elegant, accurate, and updated every day.",
+          "hero.tag": "Personalized fashion and beauty insights from your birth chart. Discover your style and shop curated pieces.",
           "hero.cta1": "Get My Cosmic Style Reading",
-          "hero.cta2": "Get daily tips by email",
           "controls.sunDay": "Sun sign and day",
           "controls.rising": "Rising (optional)",
           "controls.btnDaily": "Get daily reading",
@@ -222,15 +241,21 @@
           "how.p1": "Or add your rising for a sharper read.",
           "how.h2": "2. Read and act",
           "how.p2": "Get mood, color and outfit vibes that fit the day.",
-          "how.h3": "3. Go deeper",
-          "how.p3": "Unlock weekly alerts and chart reports with Premium.",
+          "how.h3": "3. Shop your vibe",
+          "how.p3": "Discover curated pieces that match your cosmic style.",
           "grid.title": "Today's Cosmic Style for Every Sign",
           "weekly.title": "This Week's Cosmic Highlights",
           "weekly.loading": "Loading weekly forecast...",
-          "email.title": "Get daily cosmic style tips",
-          "email.copy": "Short, elegant emails with your color, vibe and ritual. Free to join.",
-          "email.btn": "Subscribe",
           "footer.contact": "Contact",
+          "affiliate.header": "✨ Shop Your Cosmic Style",
+          "affiliate.fashion": "Fashion",
+          "affiliate.fashionDesc": "Discover {color} outfits for {sign}",
+          "affiliate.beauty": "Beauty",
+          "affiliate.beautyDesc": "{color} makeup & beauty",
+          "affiliate.jewelry": "Jewelry",
+          "affiliate.jewelryDesc": "{sign} zodiac accessories",
+          "affiliate.cta": "Explore →",
+          "affiliate.disclaimer": "We may earn a commission from purchases made through these links.",
           loading: "Loading…",
           selectSign: "Select a sign",
           readMore: "Read more",
@@ -248,9 +273,8 @@
         },
         tr: {
           "hero.head": "Günlük Kozmik Stil Rehberin",
-          "hero.tag": "Doğum haritandan kişisel moda ve güzellik içgörüleri. Zarif, net ve her gün güncel.",
+          "hero.tag": "Doğum haritandan kişisel moda ve güzellik içgörüleri. Stilini keşfet ve özenle seçilmiş parçaları al.",
           "hero.cta1": "Kozmik Stil Yorumumu Al",
-          "hero.cta2": "Günlük ipuçlarını e-postayla al",
           "controls.sunDay": "Güneş burcun ve gün",
           "controls.rising": "Yükselen (opsiyonel)",
           "controls.btnDaily": "Günlük yorumu getir",
@@ -261,15 +285,21 @@
           "how.p1": "Daha net bir okuma için yükseleni ekle.",
           "how.h2": "2. Oku ve uygula",
           "how.p2": "Güne uygun ruh, renk ve stil önerilerini al.",
-          "how.h3": "3. Derinleş",
-          "how.p3": "Premium ile haftalık uyarılar ve raporlar açılır.",
+          "how.h3": "3. Stilini al",
+          "how.p3": "Kozmik stiline uygun parçaları keşfet.",
           "grid.title": "Bugün: Tüm burçlar için kozmik stil",
           "weekly.title": "Bu Haftanın Kozmik Öne Çıkanları",
           "weekly.loading": "Haftalık tahmin yükleniyor...",
-          "email.title": "Günlük kozmik stil ipuçları",
-          "email.copy": "Renk, ruh ve ritüel özeti. Ücretsiz abonelik.",
-          "email.btn": "Abone ol",
           "footer.contact": "İletişim",
+          "affiliate.header": "✨ Kozmik Stilini Satın Al",
+          "affiliate.fashion": "Moda",
+          "affiliate.fashionDesc": "{sign} için {color} kıyafetler",
+          "affiliate.beauty": "Güzellik",
+          "affiliate.beautyDesc": "{color} makyaj & güzellik",
+          "affiliate.jewelry": "Takı",
+          "affiliate.jewelryDesc": "{sign} burç aksesuarları",
+          "affiliate.cta": "Keşfet →",
+          "affiliate.disclaimer": "Bu linklerden yapılan alışverişlerden komisyon alabiliriz.",
           loading: "Yükleniyor…",
           selectSign: "Burç seç",
           readMore: "Devamını oku",
@@ -287,9 +317,8 @@
         },
         es: {
           "hero.head": "Tu guía cósmica de estilo diaria",
-          "hero.tag": "Consejos de moda y belleza basados en tu carta natal. Elegante, preciso y actualizado a diario.",
+          "hero.tag": "Consejos de moda y belleza basados en tu carta natal. Descubre tu estilo y compra piezas seleccionadas.",
           "hero.cta1": "Obtener mi lectura cósmica",
-          "hero.cta2": "Recibir tips diarios por email",
           "controls.sunDay": "Signo solar y día",
           "controls.rising": "Ascendente (opcional)",
           "controls.btnDaily": "Leer del día",
@@ -300,15 +329,21 @@
           "how.p1": "Añade tu ascendente para afinar la lectura.",
           "how.h2": "2. Lee y actúa",
           "how.p2": "Estado de ánimo, color y vibras de outfit del día.",
-          "how.h3": "3. Profundiza",
-          "how.p3": "Alertas semanales y reportes con Premium.",
+          "how.h3": "3. Compra tu vibra",
+          "how.p3": "Descubre piezas que combinan con tu estilo cósmico.",
           "grid.title": "Estilo cósmico de hoy para cada signo",
           "weekly.title": "Destacados Cósmicos de esta Semana",
           "weekly.loading": "Cargando pronóstico semanal...",
-          "email.title": "Recibe consejos cósmicos diarios",
-          "email.copy": "Correos breves con tu color, vibra y ritual. Gratis.",
-          "email.btn": "Suscribirme",
           "footer.contact": "Contacto",
+          "affiliate.header": "✨ Compra tu Estilo Cósmico",
+          "affiliate.fashion": "Moda",
+          "affiliate.fashionDesc": "Outfits {color} para {sign}",
+          "affiliate.beauty": "Belleza",
+          "affiliate.beautyDesc": "Maquillaje {color}",
+          "affiliate.jewelry": "Joyería",
+          "affiliate.jewelryDesc": "Accesorios zodiacales {sign}",
+          "affiliate.cta": "Explorar →",
+          "affiliate.disclaimer": "Podemos ganar una comisión por compras realizadas a través de estos enlaces.",
           loading: "Cargando…",
           selectSign: "Elige un signo",
           readMore: "Leer más",
@@ -326,9 +361,8 @@
         },
         dk: {
           "hero.head": "Din daglige kosmiske stilguide",
-          "hero.tag": "Personlige mode- og beautyindsigter fra din fødselshoroskop. Elegant, præcis og opdateret hver dag.",
+          "hero.tag": "Personlige mode- og beautyindsigter fra din fødselshoroskop. Opdag din stil og shop udvalgte styles.",
           "hero.cta1": "Få min kosmiske læsning",
-          "hero.cta2": "Få daglige tips på mail",
           "controls.sunDay": "Solsign og dag",
           "controls.rising": "Ascendant (valgfri)",
           "controls.btnDaily": "Hent dagens læsning",
@@ -339,15 +373,21 @@
           "how.p1": "Tilføj ascendant for en skarpere læsning.",
           "how.h2": "2. Læs og handl",
           "how.p2": "Humør, farve og outfit-vibes til dagen.",
-          "how.h3": "3. Gå dybere",
-          "how.p3": "Ugentlige alerts og rapporter med Premium.",
+          "how.h3": "3. Shop din vibe",
+          "how.p3": "Opdag styles der matcher din kosmiske stil.",
           "grid.title": "Dagens kosmiske stil for alle tegn",
           "weekly.title": "Ugens Kosmiske Højdepunkter",
           "weekly.loading": "Indlæser ugentlig prognose...",
-          "email.title": "Få daglige kosmiske stil-tips",
-          "email.copy": "Korte, elegante mails med farve, vibe og ritual. Gratis.",
-          "email.btn": "Tilmeld",
           "footer.contact": "Kontakt",
+          "affiliate.header": "✨ Shop Din Kosmiske Stil",
+          "affiliate.fashion": "Mode",
+          "affiliate.fashionDesc": "{color} outfits til {sign}",
+          "affiliate.beauty": "Beauty",
+          "affiliate.beautyDesc": "{color} makeup & beauty",
+          "affiliate.jewelry": "Smykker",
+          "affiliate.jewelryDesc": "{sign} stjernetegn accessories",
+          "affiliate.cta": "Udforsk →",
+          "affiliate.disclaimer": "Vi kan modtage kommission fra køb gennem disse links.",
           loading: "Indlæser…",
           selectSign: "Vælg et tegn",
           readMore: "Læs mere",
@@ -380,7 +420,6 @@
       const featured = $("#featured");
       const sampleCards = $("#sample-cards");
       const weeklyContent = $("#weekly-content");
-      const emailForm = $("#emailForm"), emailInput = $("#email"), emailStatus = $("#emailStatus");
 
       // i18n apply
       function t(key){ return I18N[lang][key] || key; }
@@ -389,7 +428,6 @@
         setText("t.hero.head","hero.head");
         setText("t.hero.tag","hero.tag");
         setText("t.hero.cta1","hero.cta1");
-        setText("t.hero.cta2","hero.cta2");
         setText("t.controls.sunDay","controls.sunDay");
         setText("t.controls.rising","controls.rising");
         $("#go-daily").textContent = t("controls.btnDaily");
@@ -402,9 +440,6 @@
         setText("t.grid.title","grid.title");
         setText("t.weekly.title","weekly.title");
         setText("t.weekly.loading","weekly.loading");
-        setText("t.email.title","email.title");
-        setText("t.email.copy","email.copy");
-        setText("t.email.btn","email.btn");
         setText("t.footer.contact","footer.contact");
       }
 
@@ -456,7 +491,75 @@
       $("#go-daily").addEventListener("click", fetchDaily);
       $("#go-personal").addEventListener("click", fetchPersonal);
       $("#t.hero.cta1").addEventListener("click", ()=> sunSel.scrollIntoView({behavior:"smooth", block:"center"}));
-      $("#t.hero.cta2").addEventListener("click", ()=> $("#signup").scrollIntoView({behavior:"smooth"}));
+
+      // Affiliate link generation
+      function generateAffiliateLinks(sign, color){
+        const signName = signLabel(sign);
+        
+        // Clean color for URL (remove spaces, lowercase)
+        const colorClean = (color || "").toLowerCase().replace(/\s+/g, '+');
+        const signClean = sign.toLowerCase();
+        
+        // You'll replace these with your actual affiliate links later
+        // For now, these are generic search URLs
+        const links = {
+          fashion: {
+            en: `https://www.zalando.dk/search?q=${signClean}+${colorClean}+outfit`,
+            tr: `https://www.trendyol.com/sr?q=${signClean}+${colorClean}`,
+            es: `https://www.zara.com/es/en/search?searchTerm=${colorClean}+${signClean}`,
+            dk: `https://www.zalando.dk/search?q=${signClean}+${colorClean}+outfit`
+          },
+          beauty: {
+            en: `https://www.sephora.com/search?keyword=${colorClean}+makeup`,
+            tr: `https://www.sephora.com.tr/arama?q=${colorClean}`,
+            es: `https://www.sephora.es/search?q=${colorClean}`,
+            dk: `https://www.matas.dk/search?query=${colorClean}+makeup`
+          },
+          jewelry: {
+            en: `https://www.etsy.com/search?q=${signClean}+zodiac+jewelry`,
+            tr: `https://www.etsy.com/search?q=${signClean}+burç+kolye`,
+            es: `https://www.etsy.com/search?q=${signClean}+zodiaco+collar`,
+            dk: `https://www.etsy.com/search?q=${signClean}+stjernetegn+smykker`
+          }
+        };
+
+        return {
+          fashion: links.fashion[lang] || links.fashion.en,
+          beauty: links.beauty[lang] || links.beauty.en,
+          jewelry: links.jewelry[lang] || links.jewelry.en
+        };
+      }
+
+      function renderAffiliateSection(sign, color){
+        const links = generateAffiliateLinks(sign, color);
+        const signName = signLabel(sign);
+        
+        return `
+          <div class="affiliate-section fade-in">
+            <div class="affiliate-header">${t('affiliate.header')}</div>
+            <div class="affiliate-grid">
+              <a href="${links.fashion}" target="_blank" rel="noopener noreferrer nofollow" class="affiliate-card">
+                <div class="affiliate-card-title">👗 ${t('affiliate.fashion')}</div>
+                <div class="affiliate-card-desc">${t('affiliate.fashionDesc').replace('{color}', color).replace('{sign}', signName)}</div>
+                <div class="affiliate-card-cta">${t('affiliate.cta')}</div>
+              </a>
+              
+              <a href="${links.beauty}" target="_blank" rel="noopener noreferrer nofollow" class="affiliate-card">
+                <div class="affiliate-card-title">💄 ${t('affiliate.beauty')}</div>
+                <div class="affiliate-card-desc">${t('affiliate.beautyDesc').replace('{color}', color).replace('{sign}', signName)}</div>
+                <div class="affiliate-card-cta">${t('affiliate.cta')}</div>
+              </a>
+              
+              <a href="${links.jewelry}" target="_blank" rel="noopener noreferrer nofollow" class="affiliate-card">
+                <div class="affiliate-card-title">✨ ${t('affiliate.jewelry')}</div>
+                <div class="affiliate-card-desc">${t('affiliate.jewelryDesc').replace('{color}', color).replace('{sign}', signName)}</div>
+                <div class="affiliate-card-cta">${t('affiliate.cta')}</div>
+              </a>
+            </div>
+            <div class="affiliate-disclaimer">${t('affiliate.disclaimer')}</div>
+          </div>
+        `;
+      }
 
       async function fetchDaily(){
         const sign=sunSel.value, day=daySel.value;
@@ -508,7 +611,9 @@
             ` : ''}
             <div class="divider"></div>
             <p>${[d.paragraph,d.fashion_tip].filter(Boolean).join(" ")}</p>
-          </div>`;
+          </div>
+          ${renderAffiliateSection(code, d.color)}
+        `;
       }
 
       function renderFeaturedFromPersonal(d){
@@ -535,7 +640,9 @@
             ` : ''}
             <div class="divider"></div>
             <p>${[d.paragraph,d.fashion_tip].filter(Boolean).join(" ")}</p>
-          </div>`;
+          </div>
+          ${renderAffiliateSection(d.sun, d.color)}
+        `;
       }
 
       // Weekly forecast
@@ -610,20 +717,6 @@
         const map = { aries:"♈", taurus:"♉", gemini:"♊", cancer:"♋", leo:"♌", virgo:"♍", libra:"♎", scorpio:"♏", sagittarius:"♐", capricorn:"♑", aquarius:"♒", pisces:"♓" };
         return map[code] || "★";
       }
-
-      // email capture
-      emailForm.addEventListener("submit", async (e)=>{
-        e.preventDefault();
-        emailStatus.textContent = I18N[lang].loading;
-        try{
-          const r = await fetch(`/api/subscribe`,{
-            method:"POST", headers:{ "Content-Type":"application/json" },
-            body: JSON.stringify({ email: emailInput.value, lang })
-          });
-          if(r.ok){ emailStatus.textContent = lang==="tr"?"Teşekkürler. Listedesin.":lang==="es"?"Gracias. Ya estás en la lista.":lang==="dk"?"Tak. Du er på listen.":"Thanks. You're on the list."; emailInput.value=""; }
-          else{ emailStatus.textContent = lang==="tr"?"Şu an abone olunamadı.":lang==="es"?"No se pudo suscribir.":lang==="dk"?"Kunne ikke tilmelde.":"Could not subscribe."; }
-        }catch(_){ emailStatus.textContent = lang==="tr"?"Şu an abone olunamadı.":lang==="es"?"No se pudo suscribir.":lang==="dk"?"Kunne ikke tilmelde.":"Could not subscribe."; }
-      });
 
       // initial load
       loadSamples();
