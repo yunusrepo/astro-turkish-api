@@ -515,44 +515,52 @@
       });
 
       // Affiliate link generation
-      function generateAffiliateLinks(sign, color){
-        const signName = signLabel(sign);
-        
-        const colorClean = (color || "").toLowerCase().replace(/\s+/g, '+');
-        const signClean = sign.toLowerCase();
-        
+      // Fashion: color + clothing, Beauty: makeup, Jewelry: jewelry
+      function generateAffiliateLinks(sign, data){
+        const color    = data.color || "";
+        const clothing = data.clothing_item || "";
+        const makeup   = data.makeup_suggestion || "";
+        const jewelry  = data.jewelry_item || "";
+
+        const fashionQuery = [color, clothing].filter(Boolean).join(" ").trim() || color || clothing || "outfit";
+        const beautyQuery  = makeup || color || "makeup";
+        const jewelryQuery = jewelry || color || "zodiac jewelry";
+
+        const q = s => encodeURIComponent((s || "").toLowerCase().trim());
+
         const links = {
           fashion: {
-            en: `https://www.zalando.dk/search?q=${signClean}+${colorClean}+outfit`,
-            tr: `https://www.trendyol.com/sr?q=${signClean}+${colorClean}`,
-            es: `https://www.zara.com/es/en/search?searchTerm=${colorClean}+${signClean}`,
-            dk: `https://www.zalando.dk/search?q=${signClean}+${colorClean}+outfit`
+            en: `https://www.zalando.dk/search?q=${q(fashionQuery)}`,
+            tr: `https://www.trendyol.com/sr?q=${q(fashionQuery)}`,
+            es: `https://www.zara.com/es/en/search?searchTerm=${q(fashionQuery)}`,
+            dk: `https://www.zalando.dk/search?q=${q(fashionQuery)}`
           },
           beauty: {
-            en: `https://www.sephora.com/search?keyword=${colorClean}+makeup`,
-            tr: `https://www.sephora.com.tr/arama?q=${colorClean}`,
-            es: `https://www.sephora.es/search?q=${colorClean}`,
-            dk: `https://www.matas.dk/search?query=${colorClean}+makeup`
+            en: `https://www.sephora.com/search?keyword=${q(beautyQuery)}`,
+            tr: `https://www.sephora.com.tr/arama?q=${q(beautyQuery)}`,
+            es: `https://www.sephora.es/search?q=${q(beautyQuery)}`,
+            dk: `https://www.matas.dk/search?query=${q(beautyQuery)}`
           },
           jewelry: {
-            en: `https://www.etsy.com/search?q=${signClean}+zodiac+jewelry`,
-            tr: `https://www.etsy.com/search?q=${signClean}+burç+kolye`,
-            es: `https://www.etsy.com/search?q=${signClean}+zodiaco+collar`,
-            dk: `https://www.etsy.com/search?q=${signClean}+stjernetegn+smykker`
+            en: `https://www.etsy.com/search?q=${q(jewelryQuery)}`,
+            tr: `https://www.etsy.com/search?q=${q(jewelryQuery)}`,
+            es: `https://www.etsy.com/search?q=${q(jewelryQuery)}`,
+            dk: `https://www.etsy.com/search?q=${q(jewelryQuery)}`
           }
         };
 
         return {
           fashion: links.fashion[lang] || links.fashion.en,
-          beauty: links.beauty[lang] || links.beauty.en,
+          beauty:  links.beauty[lang]  || links.beauty.en,
           jewelry: links.jewelry[lang] || links.jewelry.en
         };
       }
 
-      function renderAffiliateSection(sign, color){
-        const links = generateAffiliateLinks(sign, color);
+      function renderAffiliateSection(sign, data){
+        const links    = generateAffiliateLinks(sign, data);
         const signName = signLabel(sign);
-        
+        const color    = data.color || "";
+
         return `
           <div class="affiliate-section fade-in">
             <div class="affiliate-header">${t('affiliate.header')}</div>
@@ -631,7 +639,7 @@
             <div class="divider"></div>
             <p>${[d.paragraph,d.fashion_tip].filter(Boolean).join(" ")}</p>
           </div>
-          ${renderAffiliateSection(code, d.color)}
+          ${renderAffiliateSection(code, d)}
         `;
       }
 
@@ -660,7 +668,7 @@
             <div class="divider"></div>
             <p>${[d.paragraph,d.fashion_tip].filter(Boolean).join(" ")}</p>
           </div>
-          ${renderAffiliateSection(d.sun, d.color)}
+          ${renderAffiliateSection(d.sun, d)}
         `;
       }
 
