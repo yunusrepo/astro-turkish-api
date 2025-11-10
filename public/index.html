@@ -43,6 +43,7 @@
       .btn{appearance:none; border:1px solid var(--line); padding:12px 16px; border-radius:999px; cursor:pointer; font-weight:600}
       .btn--brand{background:var(--ink); color:#fff; border-color:var(--ink)}
       .btn--ghost{background:#fff}
+      .btn--accent{background:var(--accent); color:#fff; border-color:var(--accent)}
       .stars{position:absolute; inset:0; pointer-events:none; background-image:radial-gradient(#cdbfff 1px, transparent 1px);}
       .stars{background-size:28px 28px; opacity:.25; animation:twinkle 6s linear infinite}
       @keyframes twinkle{0%{opacity:.18} 50%{opacity:.3} 100%{opacity:.18}}
@@ -76,7 +77,10 @@
       .badge{display:inline-flex; align-items:center; gap:6px; font-weight:600}
       .badge .icon{width:28px; height:28px; border-radius:999px; display:grid; place-items:center; color:#fff;
         background:linear-gradient(135deg,var(--accent2),#1f1b2e)}
-      .mini-line{font-size:13px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+      .mini-line{
+        font-size:13px;
+        color:var(--muted);
+      }
       .mini-cta{font-size:13px; color:#1f1b2e; font-weight:600; cursor:pointer}
       .weekly{margin:20px 0; padding:20px; border:1px solid var(--line); border-radius:16px; background:#fff}
       .weekly h2{font:600 22px/1.2 "Georgia","Times New Roman",serif; margin:0 0 14px 0}
@@ -150,7 +154,8 @@
         <h1 id="t.hero.head">Your Daily Cosmic Style Guide</h1>
         <p id="t.hero.tag">Personalized fashion and beauty insights from your birth chart. Discover your style and shop curated pieces.</p>
         <div class="cta-row">
-          <button class="btn btn--brand" id="t.hero.cta1">Get My Cosmic Style Reading</button>
+          <button class="btn btn--brand" id="hero-cta-weekly"></button>
+          <button class="btn btn--ghost" id="hero-cta-signs"></button>
         </div>
       </section>
 
@@ -209,7 +214,7 @@
       </section>
 
       <!-- SAMPLE GRID -->
-      <section class="signs">
+      <section class="signs" id="signs">
         <h2 id="t.grid.title">Today's Cosmic Style for Every Sign</h2>
         <div class="cards" id="sample-cards"></div>
       </section>
@@ -231,6 +236,8 @@
           "hero.head": "Your Daily Cosmic Style Guide",
           "hero.tag": "Personalized fashion and beauty insights from your birth chart. Discover your style and shop curated pieces.",
           "hero.cta1": "Get My Cosmic Style Reading",
+          "hero.ctaWeekly": "See this week's highlights",
+          "hero.ctaSigns": "See today's style for all signs",
           "controls.sunDay": "Sun sign and day",
           "controls.rising": "Rising (optional)",
           "controls.btnDaily": "Get daily reading",
@@ -275,6 +282,8 @@
           "hero.head": "Günlük Kozmik Stil Rehberin",
           "hero.tag": "Doğum haritandan kişisel moda ve güzellik içgörüleri. Stilini keşfet ve özenle seçilmiş parçaları al.",
           "hero.cta1": "Kozmik Stil Yorumumu Al",
+          "hero.ctaWeekly": "Bu haftanın öne çıkanlarını gör",
+          "hero.ctaSigns": "Tüm burçlar için bugünü gör",
           "controls.sunDay": "Güneş burcun ve gün",
           "controls.rising": "Yükselen (opsiyonel)",
           "controls.btnDaily": "Günlük yorumu getir",
@@ -319,6 +328,8 @@
           "hero.head": "Tu guía cósmica de estilo diaria",
           "hero.tag": "Consejos de moda y belleza basados en tu carta natal. Descubre tu estilo y compra piezas seleccionadas.",
           "hero.cta1": "Obtener mi lectura cósmica",
+          "hero.ctaWeekly": "Ver los destacados de la semana",
+          "hero.ctaSigns": "Ver el estilo de hoy para todos los signos",
           "controls.sunDay": "Signo solar y día",
           "controls.rising": "Ascendente (opcional)",
           "controls.btnDaily": "Leer del día",
@@ -363,6 +374,8 @@
           "hero.head": "Din daglige kosmiske stilguide",
           "hero.tag": "Personlige mode- og beautyindsigter fra din fødselshoroskop. Opdag din stil og shop udvalgte styles.",
           "hero.cta1": "Få min kosmiske læsning",
+          "hero.ctaWeekly": "Se ugens højdepunkter",
+          "hero.ctaSigns": "Se dagens stil for alle tegn",
           "controls.sunDay": "Solsign og dag",
           "controls.rising": "Ascendant (valgfri)",
           "controls.btnDaily": "Hent dagens læsning",
@@ -427,7 +440,8 @@
       function setUI(){
         setText("t.hero.head","hero.head");
         setText("t.hero.tag","hero.tag");
-        setText("t.hero.cta1","hero.cta1");
+        $("#hero-cta-weekly").textContent = t("hero.ctaWeekly");
+        $("#hero-cta-signs").textContent = t("hero.ctaSigns");
         setText("t.controls.sunDay","controls.sunDay");
         setText("t.controls.rising","controls.rising");
         $("#go-daily").textContent = t("controls.btnDaily");
@@ -490,7 +504,14 @@
 
       $("#go-daily").addEventListener("click", fetchDaily);
       $("#go-personal").addEventListener("click", fetchPersonal);
-      $("#t.hero.cta1").addEventListener("click", ()=> sunSel.scrollIntoView({behavior:"smooth", block:"center"}));
+
+      $("#hero-cta-weekly").addEventListener("click", () => {
+        $("#weekly").scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+
+      $("#hero-cta-signs").addEventListener("click", () => {
+        $("#signs").scrollIntoView({ behavior: "smooth", block: "start" });
+      });
 
       // Affiliate link generation
       function generateAffiliateLinks(sign, color){
@@ -500,7 +521,7 @@
         const colorClean = (color || "").toLowerCase().replace(/\s+/g, '+');
         const signClean = sign.toLowerCase();
         
-        // You'll replace these with your actual affiliate links later
+        // You will replace these with your actual affiliate links later
         // For now, these are generic search URLs
         const links = {
           fashion: {
@@ -696,19 +717,25 @@
         const good = results.find(x=>x&&x.d&&x.d.description);
         if(good) renderFeaturedFromDaily(good.d, good.code);
 
-        results.filter(Boolean).forEach(({code,d})=>{
-          const card=document.createElement("div");
-          card.className="card-mini";
-          card.innerHTML=`
+        results.filter(Boolean).forEach(({ code, d }) => {
+          const card = document.createElement("div");
+          card.className = "card-mini";
+
+          let html = `
             <div class="badge"><span class="icon">${signIcon(code)}</span> ${signLabel(code)}</div>
-            <div class="mini-line">${d.description||""}</div>
-            <div class="mini-line"><strong>${kvLabel("color")}:</strong> ${d.color||"-"}</div>
-            <div class="mini-line"><strong>${kvLabel("mood")}:</strong> ${d.mood||"-"}</div>
-            <div class="mini-cta" data-sign="${code}">${I18N[lang].readMore}</div>`;
-          card.querySelector(".mini-cta").addEventListener("click",()=>{
-            renderFeaturedFromDaily(d, code);
-            $("#hero").scrollIntoView({behavior:"smooth", block:"start"});
-          });
+            <div class="mini-line">${d.description || ""}</div>
+            <div class="mini-line"><strong>${kvLabel("color")}:</strong> ${d.color || "-"}</div>
+            <div class="mini-line"><strong>${kvLabel("mood")}:</strong> ${d.mood || "-"}</div>
+          `;
+
+          if (d.paragraph || d.fashion_tip) {
+            html += `
+              <div class="divider"></div>
+              <div class="mini-line">${[d.paragraph, d.fashion_tip].filter(Boolean).join(" ")}</div>
+            `;
+          }
+
+          card.innerHTML = html;
           sampleCards.appendChild(card);
         });
       }
